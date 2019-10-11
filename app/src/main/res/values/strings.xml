@@ -1,3 +1,26 @@
 <resources>
     <string name="app_name">TeleTalk</string>
+
+    <!--App Intro Slider-->
+    <string name="next">NEXT</string>
+    <string name="skip">SKIP</string>
+    <string name="start">GOT IT</string>
+
+    <string name="slide_1_title">Hello Traveller!</string>
+    <string name="slide_1_desc">Rasai is an easy way to arrange transport for your out of city trip!</string>
+
+    <string name="slide_2_title">Post Your Trip</string>
+    <string name="slide_2_desc">Just add the place, date, time, price range etc. of your trip!</string>
+
+    <string name="slide_3_title">Get A Response</string>
+    <string name="slide_3_desc">You will receive an alert if a driver is interested in taking you to your destination!</string>
+
+    <string name="slide_4_title">Confirm Trip</string>
+    <string name="slide_4_desc">Confirm the trip with the driver of your choice!</string>
+
+    <string name="slide_5_title">In App Chat</string>
+    <string name="slide_5_desc">Start a conversation with your driver!</string>
+
+    <string name="slide_6_title">Enjoy Your Trip</string>
+    <string name="slide_6_desc">Safe Travels!</string>
 </resources>
