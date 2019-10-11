@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "341337908709",
+    "firebase_url": "https://teletalk-e36e6.firebaseio.com",
+    "project_id": "teletalk-e36e6",
+    "storage_bucket": "teletalk-e36e6.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:341337908709:android:a8cf632dac63d3966cbb0c",
+        "android_client_info": {
+          "package_name": "com.strigiformes.teletalk"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "341337908709-ulf7hp9bp80ehsfd4sserp3l8h17skvm.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.strigiformes.teletalk",
+            "certificate_hash": "57e49c50162c25a1dee5c59585b07136f645c559"
+          }
+        },
+        {
+          "client_id": "341337908709-tciiek8m96akidov0ca2ccklioofvdaf.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDKnagrc7J27hfIKLUquDUcV-Vaqih_8nQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "341337908709-tciiek8m96akidov0ca2ccklioofvdaf.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
