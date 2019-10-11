@@ -36,6 +36,9 @@ dependencies {
     implementation 'com.google.firebase:firebase-auth:19.1.0'
 
     implementation 'com.google.firebase:firebase-core:17.2.0'
+
+    //for TabView
+    implementation 'com.google.android.material:material:1.0.0'
 }
 
 apply plugin: 'com.google.gms.google-services'

@@ -124,7 +124,7 @@ public class WelcomeActivity extends AppCompatActivity {
     private void launchHomeScreen() {
         //prefManager.setFirstTimeLaunch(false);
         Log.d("WelcomeActivity", "launching triptabs");
-        startActivity(new Intent(WelcomeActivity.this, Home.class));
+        startActivity(new Intent(WelcomeActivity.this, HomeActivity.class));
         finish();
     }
 
