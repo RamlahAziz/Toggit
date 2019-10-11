@@ -1,9 +1,67 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
+<androidx.constraintlayout.widget.ConstraintLayout android:layout_height="match_parent"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".HomeActivity">
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <TextView
+        android:id="@+id/noChatsLayout"
+        android:gravity="center"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:drawableTop="@drawable/ic_test"
+        android:drawablePadding="24dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="170dp"
+        android:paddingLeft="@dimen/desc_padding"
+        android:paddingRight="@dimen/desc_padding"
+        android:text="Let's get started! Click on the button to start"
+        android:textAlignment="center"
+        android:textColor="@color/darkgrey"
+        android:textSize="16sp"
+        android:layout_marginBottom="50dp"/>
+
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:paddingBottom="16dp"
+        android:paddingStart="16dp"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp"
+        android:paddingEnd="16dp">
+
+        <ListView
+            android:id="@+id/list_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:divider="@null"
+            android:dividerHeight="0dp"/>
+
+    </LinearLayout>
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:layout_marginRight="16dp"
+            android:layout_marginBottom="60dp"
+            android:id="@+id/fab"
+            app:layout_anchor="@id/list_view"
+            app:layout_anchorGravity="bottom|right|end"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+
+            app:fabSize="normal"
+            android:layout_marginEnd="16dp" />
+        <!--app:srcCompat="@drawable/ic_add"-->
+
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
