@@ -1,9 +1,11 @@
-package com.strigiformes.teletalk;
+package com.strigiformes.teletalk.Startup;
 
 import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.strigiformes.teletalk.Startup.MainActivity;
 
 public class SplashActivity extends AppCompatActivity {
     @Override

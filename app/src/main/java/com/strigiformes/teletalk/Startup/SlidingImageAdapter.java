@@ -1,4 +1,4 @@
-package com.strigiformes.teletalk;
+package com.strigiformes.teletalk.Startup;
 
 import android.content.Context;
 import android.net.Uri;
@@ -12,6 +12,7 @@ import androidx.viewpager.widget.PagerAdapter;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
+import com.strigiformes.teletalk.R;
 
 public class SlidingImageAdapter extends PagerAdapter {
 
