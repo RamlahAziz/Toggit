@@ -23,6 +23,7 @@ import androidx.viewpager.widget.ViewPager;
 
 
 //this implements the welcome activity
+//it works perfectly you don't need to change it
 public class WelcomeActivity extends AppCompatActivity {
 
     private ViewPager viewPager;

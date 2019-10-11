@@ -4,6 +4,8 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
+    <!--to be displayed when user has no chats in the beginning
+    a pretty picture and some text-->
     <TextView
         android:id="@+id/noChatsLayout"
         android:gravity="center"
@@ -40,7 +42,7 @@
         android:paddingRight="16dp"
         android:paddingEnd="16dp">
 
-        <!--chats list-->
+        <!--actual list of chats. implementation is in java-->
         <ListView
             android:id="@+id/list_view"
             android:layout_width="match_parent"
@@ -53,16 +55,16 @@
         <!--new chats button-->
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:layout_marginRight="16dp"
-            android:layout_marginBottom="60dp"
+            android:layout_marginBottom="16dp"
             android:id="@+id/fab"
             app:layout_anchor="@id/list_view"
             app:layout_anchorGravity="bottom|right|end"
             android:layout_width="56dp"
             android:layout_height="56dp"
-
+            app:srcCompat="@drawable/ic_message"
             app:fabSize="normal"
             android:layout_marginEnd="16dp" />
-        <!--app:srcCompat="@drawable/ic_add"-->
+        <!---->
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 

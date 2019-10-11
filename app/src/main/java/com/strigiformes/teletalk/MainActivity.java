@@ -39,7 +39,6 @@ public class MainActivity extends AppCompatActivity {
         //int resultcode = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(this);
 
         //adjustFontScale(getResources().getConfiguration());
-        //setContentView(R.layout.activity_main);
 
         //hide the top bar
         getSupportActionBar().hide();
