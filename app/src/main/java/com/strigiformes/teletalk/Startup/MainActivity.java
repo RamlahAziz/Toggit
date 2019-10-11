@@ -14,6 +14,9 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.Arrays;
 
+
+//this implements the firebase registration process
+//it goes to the welcome screens after this
 public class MainActivity extends AppCompatActivity {
 
     private static final int RC_SIGN_IN = 123;
@@ -27,6 +30,11 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        //int resultcode = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(this);
+
+        //adjustFontScale(getResources().getConfiguration());
+
+        //hide the top bar
         getSupportActionBar().hide();
 
         Firebase.setAndroidContext(this);

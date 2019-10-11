@@ -24,6 +24,9 @@ import androidx.viewpager.widget.ViewPager;
 import com.strigiformes.teletalk.Home;
 import com.strigiformes.teletalk.R;
 
+
+//this implements the welcome activity
+//it works perfectly you don't need to change it
 public class WelcomeActivity extends AppCompatActivity {
 
     private ViewPager viewPager;

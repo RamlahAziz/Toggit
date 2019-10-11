@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#008577</color>
+    <color name="colorPrimary">#17BEBB</color>
     <color name="colorPrimaryDark">#00574B</color>
     <color name="colorAccent">#D81B60</color>
     <color name="darkgrey">#777777</color>
-    <color name="black">#000000</color>
+    <color name="smokyBlack">#0A0908</color>
     <color name="maroon">#BF0000</color>
     <color name="white">#ffffff</color>
     <color name="red">#e50000</color>
@@ -14,9 +14,10 @@
     <color name="slategray">#D3D3D3</color>
     <color name="orange">#ECA400</color>
     <color name="green">#00A82A</color>
-    <color name="blue">#00B2FF</color>
+    <color name="tiffanyBlue">#17BEBB</color>
     <color name="standardBlue"> #0000EE</color>
-    <color name="rasaiblue">#224B7F</color>
+    <color name="pearlAqua">#7FEFBD</color>
+    <color name="alabaster">#F3EFE0</color>
 
     <!--App Intro Slider-->
     <color name="colorPrimary2">#3F51B5</color>

@@ -5,6 +5,7 @@ import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+//splash activity to show until the app loads in the background
 import com.strigiformes.teletalk.Startup.MainActivity;
 
 public class SplashActivity extends AppCompatActivity {
