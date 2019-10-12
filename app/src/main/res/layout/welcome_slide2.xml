@@ -10,8 +10,7 @@
             android:layout_width="@dimen/img_width_height"
             android:layout_height="@dimen/img_width_height"
             android:layout_margin="24dp"
-
-            android:src="@drawable/ic_test"/>
+            android:src="@drawable/colour_logo"/>
             <!--android:src="@drawable/ic_movie"-->
 
         <TextView
