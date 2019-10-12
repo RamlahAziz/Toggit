@@ -1,4 +1,4 @@
-package com.strigiformes.teletalk.Startup;
+package com.strigiformes.teletalk;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -21,7 +21,6 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.InstanceIdResult;
-import com.strigiformes.teletalk.R;
 
 import java.util.HashMap;
 import java.util.Map;
