@@ -1,17 +1,15 @@
-package com.strigiformes.teletalk;
+package com.strigiformes.teletalk.Startup;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 
 import com.firebase.client.Firebase;
 import com.firebase.ui.auth.AuthUI;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.Arrays;
@@ -29,10 +27,6 @@ public class MainActivity extends AppCompatActivity {
     private FirebaseUser user = mauth.getCurrentUser();
     private FirebaseAuth.AuthStateListener mAuthListener;
 
-    private DatabaseReference mRef;
-    private ValueEventListener listener;
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -44,9 +38,6 @@ public class MainActivity extends AppCompatActivity {
         getSupportActionBar().hide();
 
         Firebase.setAndroidContext(this);
-
-        //mRef = FirebaseDatabase.getInstance().getReference().child("Driver");
-
 
         mAuthListener = new FirebaseAuth.AuthStateListener() {
                /*gets invoked in the UI thread on changes in the authentication state
@@ -89,15 +80,6 @@ public class MainActivity extends AppCompatActivity {
     public void onBackPressed() {
         finish();
     }
-
-    /*private void adjustFontScale(Configuration configuration) {
-        configuration.fontScale = (float) 1.0;
-        DisplayMetrics metrics = getResources().getDisplayMetrics();
-        WindowManager wm = (WindowManager) getSystemService(WINDOW_SERVICE);
-        wm.getDefaultDisplay().getMetrics(metrics);
-        metrics.scaledDensity = configuration.fontScale * metrics.density;
-        getBaseContext().getResources().updateConfiguration(configuration, metrics);
-    }*/
 
     @Override
     protected void onStart() {
