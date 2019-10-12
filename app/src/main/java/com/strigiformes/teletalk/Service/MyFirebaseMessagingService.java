@@ -15,7 +15,7 @@ import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 import com.strigiformes.teletalk.HomeActivity;
 import com.strigiformes.teletalk.R;
-import com.strigiformes.teletalk.Startup.WelcomeActivity;
+import com.strigiformes.teletalk.WelcomeActivity;
 
 import androidx.core.app.NotificationCompat;
 
