@@ -11,10 +11,10 @@
         android:theme="@style/AppTheme">
         <activity android:name=".MessageActivity"></activity>
         <activity android:name=".HomeActivity" />
-        <activity android:name=".WelcomeActivity" />
-        <activity android:name=".MainActivity" />
+        <activity android:name="Startup.WelcomeActivity" />
+        <activity android:name="Startup.MainActivity" />
         <activity
-            android:name=".SplashActivity"
+            android:name="Startup.SplashActivity"
             android:screenOrientation="portrait"
             android:theme="@style/SplashTheme">
             <intent-filter>

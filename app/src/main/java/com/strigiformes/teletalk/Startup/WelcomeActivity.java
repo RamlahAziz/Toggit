@@ -21,7 +21,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.viewpager.widget.PagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
-import com.strigiformes.teletalk.Home;
+import com.strigiformes.teletalk.HomeActivity;
 import com.strigiformes.teletalk.R;
 
 
@@ -130,7 +130,7 @@ public class WelcomeActivity extends AppCompatActivity {
     private void launchHomeScreen() {
         //prefManager.setFirstTimeLaunch(false);
         Log.d("WelcomeActivity", "launching triptabs");
-        startActivity(new Intent(WelcomeActivity.this, Home.class));
+        startActivity(new Intent(WelcomeActivity.this, HomeActivity.class));
         finish();
     }
 
