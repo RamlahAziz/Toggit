@@ -1,14 +1,20 @@
 package com.strigiformes.teletalk;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 
 import com.firebase.client.Firebase;
 import com.firebase.ui.auth.AuthUI;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.Arrays;
 
@@ -24,6 +30,8 @@ public class MainActivity extends AppCompatActivity {
     private FirebaseAuth mauth = FirebaseAuth.getInstance();
     private FirebaseUser user = mauth.getCurrentUser();
     private FirebaseAuth.AuthStateListener mAuthListener;
+
+    private final FirebaseFirestore db = FirebaseFirestore.getInstance();;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,7 +58,52 @@ public class MainActivity extends AppCompatActivity {
 
                     user = mauth.getCurrentUser();
 
-                    if( user != null){
+                    if (user!=null) {
+                        //check if user is already registered
+                        db.collection("users").document(user.getPhoneNumber()).get()
+                                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+
+                                        /*
+                                         * if the user is already registered direct them to HomeActivity
+                                         * otherwise direct them to the registration page
+                                         * */
+
+                                        if (task.isSuccessful()) {
+                                            DocumentSnapshot document = task.getResult();
+                                            if (document.exists()) {
+                                                Log.d(TAG, "DocumentSnapshot data: " + document.getData());
+
+                                                Intent homeIntent = new Intent(MainActivity.this,  HomeActivity.class);
+                                                startActivity(homeIntent);
+
+                                            } else {
+                                                Log.d(TAG, "No such document");
+
+                                                Intent registrationIntent = new Intent(MainActivity.this,  UserRegistration.class);
+                                                startActivity(registrationIntent);
+
+                                            }
+                                        } else {
+                                            Log.d(TAG, "get failed with ", task.getException());
+                                        }
+                                    }
+                                });
+                    } else {
+                        //create login options
+                        startActivityForResult(AuthUI.getInstance().
+                                        createSignInIntentBuilder().
+                                        setAvailableProviders
+                                                (Arrays.asList(
+                                                        new AuthUI.IdpConfig.PhoneBuilder()
+                                                                .build()/*,
+                                        new AuthUI.IdpConfig.EmailBuilder()
+                                                .build()*/)).build(),
+                                RC_SIGN_IN);
+                    }
+
+                    /*if( user != null){
                         Intent welcomeIntent = new Intent(MainActivity.this,  WelcomeActivity.class);
                         startActivity(welcomeIntent);
                         //already signed in
@@ -65,9 +118,9 @@ public class MainActivity extends AppCompatActivity {
                                                         new AuthUI.IdpConfig.PhoneBuilder()
                                                                 .build()/*,
                                         new AuthUI.IdpConfig.EmailBuilder()
-                                                .build()*/)).build(),
+                                                .build()*//*)).build(),
                                 RC_SIGN_IN);
-                    }
+                    }*/
                 }
             };
 
