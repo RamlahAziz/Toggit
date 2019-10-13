@@ -71,18 +71,18 @@ public class UserRegistration extends AppCompatActivity {
                                     newUser.put("tokenId", task.getResult().getToken());
 
                                     // Add a new document with a generated ID
-                                    db.collection("users")
-                                            .add(newUser)
-                                            .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                                    db.collection("users").document(user.getPhoneNumber())
+                                            .set(newUser)
+                                            .addOnSuccessListener(new OnSuccessListener<Void>() {
                                                 @Override
-                                                public void onSuccess(DocumentReference documentReference) {
-                                                    Log.d(TAG, "DocumentSnapshot added with ID: " + documentReference.getId());
+                                                public void onSuccess(Void aVoid) {
+                                                    Log.d(TAG, "DocumentSnapshot successfully written!");
                                                 }
                                             })
                                             .addOnFailureListener(new OnFailureListener() {
                                                 @Override
                                                 public void onFailure(@NonNull Exception e) {
-                                                    Log.w(TAG, "Error adding document", e);
+                                                    Log.w(TAG, "Error writing document", e);
                                                 }
                                             });
 

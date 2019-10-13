@@ -6,6 +6,7 @@ public class User {
     private String profilePicture;
     private String uid;
     private String deviceToken;
+    private String phoneNumber;
 
 
 }
