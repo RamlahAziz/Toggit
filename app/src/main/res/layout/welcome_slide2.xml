@@ -20,8 +20,8 @@
         android:textColor="@color/colorPrimaryDark"
         android:textSize="@dimen/slide_title"
         android:textStyle="bold"
-        android:textAlignment="center"/>
-
+        android:textAlignment="center"
+        android:fontFamily="@font/toy"/>
     <ImageView
         android:layout_width="240dp"
         android:layout_height="225dp"

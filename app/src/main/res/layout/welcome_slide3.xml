@@ -19,7 +19,8 @@
             android:text="@string/slide_3_title"
             android:textColor="@color/colorPrimaryDark"
             android:textSize="@dimen/slide_title"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            android:fontFamily="@font/toy"/>
 
     <ImageView
         android:layout_width="271dp"
