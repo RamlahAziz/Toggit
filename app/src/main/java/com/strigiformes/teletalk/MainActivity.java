@@ -1,4 +1,4 @@
-package com.strigiformes.teletalk.Startup;
+package com.strigiformes.teletalk;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -9,8 +9,6 @@ import com.firebase.client.Firebase;
 import com.firebase.ui.auth.AuthUI;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.ValueEventListener;
 
 import java.util.Arrays;
 

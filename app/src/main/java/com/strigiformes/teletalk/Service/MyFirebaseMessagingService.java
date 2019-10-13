@@ -13,9 +13,9 @@ import android.util.Log;
 
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
-import com.strigiformes.teletalk.Home;
+import com.strigiformes.teletalk.HomeActivity;
 import com.strigiformes.teletalk.R;
-import com.strigiformes.teletalk.Startup.WelcomeActivity;
+import com.strigiformes.teletalk.WelcomeActivity;
 
 import androidx.core.app.NotificationCompat;
 
@@ -43,7 +43,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         }
         else{
-            intent = new Intent(this, Home.class);
+            intent = new Intent(this, HomeActivity.class);
             intent.putExtra("OPEN_TAB", "posted");
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         }
