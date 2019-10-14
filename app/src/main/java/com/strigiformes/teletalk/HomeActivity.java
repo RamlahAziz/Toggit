@@ -1,12 +1,16 @@
 package com.strigiformes.teletalk;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
@@ -15,6 +19,8 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
 import java.util.List;
+import com.strigiformes.teletalk.R;
+
 
 //Home screen of our app
 //This displays a list of current chats user has
@@ -33,6 +39,9 @@ public class HomeActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         //this is the xml file being used : activity_home
         setContentView(R.layout.activity_home);
+
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
 
         mListView = findViewById(R.id.list_view);
         mNoChatsLayout = findViewById(R.id.noChatsLayout);
@@ -102,5 +111,39 @@ public class HomeActivity extends AppCompatActivity {
                 startActivity(contactsIntent);
             }
         });
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        switch(id){
+
+            case R.id.action_blocked:
+                break;
+
+            case R.id.action_archived:
+                break;
+
+            case R.id.action_settings:
+                break;
+
+            case R.id.action_logout:
+                break;
+
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 }

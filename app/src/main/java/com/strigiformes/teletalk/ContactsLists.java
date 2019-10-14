@@ -48,7 +48,6 @@ public class ContactsLists extends Activity{
         setContentView(R.layout.activity_contacts_lists);
 
         mListView = findViewById(R.id.list);
-
         readContacts();
 
         mAdapter = new CustomListAdapter(ContactsLists.this, R.layout.contact_list_item, phoneContacts);
