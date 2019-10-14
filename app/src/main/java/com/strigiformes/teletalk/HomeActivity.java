@@ -11,6 +11,8 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,6 +26,7 @@ public class HomeActivity extends AppCompatActivity {
     private ListView mListView;
     private View mNoChatsLayout;
     private List<ChatListItem> chatsList = new ArrayList<ChatListItem>();
+    private FloatingActionButton fab;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,6 +36,7 @@ public class HomeActivity extends AppCompatActivity {
 
         mListView = findViewById(R.id.list_view);
         mNoChatsLayout = findViewById(R.id.noChatsLayout);
+        fab = findViewById(R.id.fab);
 
         //mAdapter = new ChatListAdapter(MainChat.this, R.layout.activity_home, chatsList);
         //mListView.setAdapter(mAdapter);
@@ -91,7 +95,12 @@ public class HomeActivity extends AppCompatActivity {
             }
         });
 
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent contactsIntent = new Intent(HomeActivity.this, ContactsLists.class);
+                startActivity(contactsIntent);
+            }
+        });
     }
-
-
 }
