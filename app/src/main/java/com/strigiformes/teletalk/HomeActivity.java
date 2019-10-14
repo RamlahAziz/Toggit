@@ -13,14 +13,15 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.ListView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
 import java.util.List;
-import com.strigiformes.teletalk.R;
 
+import com.google.firebase.auth.FirebaseAuth;
 
 //Home screen of our app
 //This displays a list of current chats user has
@@ -34,6 +35,8 @@ public class HomeActivity extends AppCompatActivity {
     private List<ChatListItem> chatsList = new ArrayList<ChatListItem>();
     private FloatingActionButton fab;
 
+    private Button mSignOut;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -46,6 +49,7 @@ public class HomeActivity extends AppCompatActivity {
         mListView = findViewById(R.id.list_view);
         mNoChatsLayout = findViewById(R.id.noChatsLayout);
         fab = findViewById(R.id.fab);
+        mSignOut = (Button) findViewById(R.id.action_logout);
 
         //mAdapter = new ChatListAdapter(MainChat.this, R.layout.activity_home, chatsList);
         //mListView.setAdapter(mAdapter);
@@ -85,7 +89,7 @@ public class HomeActivity extends AppCompatActivity {
                                 //delete(chatsList.get(i).getChatId());
                                 break;
                             case 2: // Block
-                                //block(chatsList.get(i).getChatId(), chatsList.get(i).getCustomerPhone());
+                                //block(chatsList.get(i).getChatId(), chatsList.get(i).getToPhone());
                                 break;
                             /*case 3: // Report
                                 break;*/
@@ -140,10 +144,28 @@ public class HomeActivity extends AppCompatActivity {
                 break;
 
             case R.id.action_logout:
+                signOut(mSignOut);
                 break;
 
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void signOut(Button button){
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // [START auth_sign_out]
+                FirebaseAuth.getInstance().signOut();
+                // [END auth_sign_out]
+
+                finishAffinity();
+
+                Intent intent = new Intent(HomeActivity.this, MainActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+                startActivity(intent);
+            }
+        });
     }
 }

@@ -1,8 +1,9 @@
 package com.strigiformes.teletalk.CustomObjects;
 
+import java.io.Serializable;
 import java.util.Objects;
 
-public class User {
+public class User implements Serializable {
 
     private String name;
     private String profilePicture;
@@ -77,4 +78,6 @@ public class User {
     public int hashCode() {
         return Objects.hash(getName(), getProfilePicture(), getUid(), getDeviceToken(), getPhoneNumber());
     }
+
+
 }

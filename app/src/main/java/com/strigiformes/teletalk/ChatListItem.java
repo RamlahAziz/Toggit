@@ -5,44 +5,45 @@ import java.io.Serializable;
 public class ChatListItem implements Serializable {
 
     private String name;
-    private String from;
-    private String to;
     private String timeStamp;
     private String msgPreview;
     private String pictureUri;
     private String chatId;
-    private String driverPhone;
-    private String customerPhone;
+    private String fromPhone;
+    private String toPhone;
+
+    public ChatListItem(String name, String fromPhone) {
+        this.name = name;
+        this.fromPhone = fromPhone;
+    }
 
     @Override
     public String toString() {
         return "ChatListItem{" +
                 "name='" + name + '\'' +
-                ", from='" + from + '\'' +
-                ", to='" + to + '\'' +
                 ", timeStamp='" + timeStamp + '\'' +
                 ", msgPreview='" + msgPreview + '\'' +
                 ", pictureUri='" + pictureUri + '\'' +
                 ", chatId='" + chatId + '\'' +
-                ", driverPhone='" + driverPhone + '\'' +
-                ", customerPhone='" + customerPhone + '\'' +
+                ", fromPhone='" + fromPhone + '\'' +
+                ", toPhone='" + toPhone + '\'' +
                 '}';
     }
 
-    public String getCustomerPhone() {
-        return customerPhone;
+    public String getToPhone() {
+        return toPhone;
     }
 
-    public void setCustomerPhone(String customerPhone) {
-        this.customerPhone = customerPhone;
+    public void setToPhone(String toPhone) {
+        this.toPhone = toPhone;
     }
 
-    public String getDriverPhone() {
-        return driverPhone;
+    public String getFromPhone() {
+        return fromPhone;
     }
 
-    public void setDriverPhone(String driverPhone) {
-        this.driverPhone = driverPhone;
+    public void setFromPhone(String fromPhone) {
+        this.fromPhone = fromPhone;
     }
 
     public String getChatId() {
@@ -67,22 +68,6 @@ public class ChatListItem implements Serializable {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public String getFrom() {
-        return from;
-    }
-
-    public void setFrom(String from) {
-        this.from = from;
-    }
-
-    public String getTo() {
-        return to;
-    }
-
-    public void setTo(String to) {
-        this.to = to;
     }
 
     public String getTimeStamp() {
