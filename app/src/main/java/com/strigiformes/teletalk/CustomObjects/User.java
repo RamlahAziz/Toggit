@@ -1,5 +1,7 @@
 package com.strigiformes.teletalk.CustomObjects;
 
+import java.util.Objects;
+
 public class User {
 
     private String name;
@@ -57,5 +59,22 @@ public class User {
                 ", deviceToken='" + deviceToken + '\'' +
                 ", phoneNumber='" + phoneNumber + '\'' +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof User)) return false;
+        User user = (User) o;
+        return Objects.equals(getName(), user.getName()) &&
+                Objects.equals(getProfilePicture(), user.getProfilePicture()) &&
+                Objects.equals(getUid(), user.getUid()) &&
+                Objects.equals(getDeviceToken(), user.getDeviceToken()) &&
+                Objects.equals(getPhoneNumber(), user.getPhoneNumber());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getName(), getProfilePicture(), getUid(), getDeviceToken(), getPhoneNumber());
     }
 }
