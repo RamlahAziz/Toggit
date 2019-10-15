@@ -40,7 +40,7 @@ public class ContactsLists extends Activity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_contacts_lists);
 
-        mListView = findViewById(R.id.list);
+        mListView = findViewById(R.id.contacts_list);
 
         readContacts();
 

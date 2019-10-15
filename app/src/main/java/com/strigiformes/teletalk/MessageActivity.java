@@ -9,10 +9,11 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MessageActivity extends AppCompatActivity {
+public class MessageActivity extends AppCompatActivity  {
 
     //private static final int ACTIVITY_NUM = 1;
 
@@ -37,6 +38,8 @@ public class MessageActivity extends AppCompatActivity {
 
         assert getSupportActionBar() != null;   //null check
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);   //show back button
+        setTitle(chat.getName());
+
 
         mMessageRecycler =  findViewById(R.id.reyclerview_message_list);
         /*
