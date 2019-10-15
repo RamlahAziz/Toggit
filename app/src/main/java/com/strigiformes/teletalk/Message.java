@@ -13,8 +13,8 @@ public class Message {
     private long timestamp;
     private String threadId;
     private String time;
-    private String token_receiver;
-    private String sender_name;
+    private String tokenReceiver;
+    private String senderName;
 
     public Message() {
     }
@@ -27,12 +27,12 @@ public class Message {
         this.time=new SimpleDateFormat("hh:mm KK").format(new Date(timestamp));
     }
 
-    public String getToken_receiver() {
-        return token_receiver;
+    public String getTokenReceiver() {
+        return tokenReceiver;
     }
 
-    public void setToken_receiver(String token_receiver) {
-        this.token_receiver = token_receiver;
+    public void setTokenReceiver(String tokenReceiver) {
+        this.tokenReceiver = tokenReceiver;
     }
 
     public String getThreadId() {
@@ -75,12 +75,12 @@ public class Message {
         this.timestamp = timestamp;
     }
 
-    public String getSender_name() {
-        return sender_name;
+    public String getSenderName() {
+        return senderName;
     }
 
-    public void setSender_name(String sender_name) {
-        this.sender_name = sender_name;
+    public void setSenderName(String senderName) {
+        this.senderName = senderName;
     }
 
     @Override
@@ -92,8 +92,8 @@ public class Message {
                 ", timestamp=" + timestamp +
                 ", threadId='" + threadId + '\'' +
                 ", time='" + time + '\'' +
-                ", token_receiver='" + token_receiver + '\'' +
-                ", sender_name='" + sender_name + '\'' +
+                ", tokenReceiver='" + tokenReceiver + '\'' +
+                ", senderName='" + senderName + '\'' +
                 '}';
     }
 }

@@ -36,7 +36,7 @@ public class UserRegistration extends AppCompatActivity {
     private TextInputEditText mName;
     private Button mNext;
 
-    private final FirebaseFirestore db = FirebaseFirestore.getInstance();;
+    private final FirebaseFirestore db = FirebaseFirestore.getInstance();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

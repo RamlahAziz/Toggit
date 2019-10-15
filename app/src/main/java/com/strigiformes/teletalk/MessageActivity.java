@@ -1,17 +1,35 @@
 package com.strigiformes.teletalk;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
-import java.io.Serializable;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentChange;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.ListenerRegistration;
+import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class MessageActivity extends AppCompatActivity  {
 
@@ -28,6 +46,12 @@ public class MessageActivity extends AppCompatActivity  {
     private ChatListItem chat;
     private String TAG = "MessageListActivity";
 
+    private FirebaseAuth mauth = FirebaseAuth.getInstance();
+    private FirebaseUser user = mauth.getCurrentUser();
+    private final FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+    ListenerRegistration registration;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -40,6 +64,7 @@ public class MessageActivity extends AppCompatActivity  {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);   //show back button
         setTitle(chat.getName());
 
+        user = mauth.getCurrentUser();
 
         mMessageRecycler =  findViewById(R.id.reyclerview_message_list);
         /*
@@ -53,7 +78,7 @@ public class MessageActivity extends AppCompatActivity  {
         mTextbox =  findViewById(R.id.edittext_chatbox);
         mNoMessageLayout = findViewById(R.id.noMessageLayout);
 
-        /*
+
         mMessageAdapter = new MessageListAdapter(MessageActivity.this, messageList);
 
         mMessageRecycler.setAdapter(mMessageAdapter);
@@ -64,19 +89,136 @@ public class MessageActivity extends AppCompatActivity  {
         mMessageRecycler.setLayoutManager(mManager);
 
         sendMessage(mSendButton);
-        */
+
+        retrieveMessages();
+
     }
 
     private void sendMessage(Button button){
+
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 String content = mTextbox.getText().toString().trim();
                 if (content.length() > 0) {
 
+                    db.collection("users").document(chat.getToPhone()).get()
+                            .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                @Override
+                                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+
+                                    final Message message = new Message();
+
+                                    if (task.isSuccessful()) {
+                                        DocumentSnapshot receiverDoc = task.getResult();
+                                        message.setTokenReceiver(receiverDoc.getData().get("tokenId").toString());
+                                        message.setTextMessage(mTextbox.getText().toString());
+                                        message.setIdSender(user.getPhoneNumber());
+                                        message.setIdReceiver(chat.getToPhone());
+                                        message.setTimestamp(System.currentTimeMillis());
+                                    }
+
+                                    db.collection("users").document(user.getPhoneNumber()).get()
+                                            .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                                @Override
+                                                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                                    if (task.isSuccessful()) {
+                                                        DocumentSnapshot senderDoc = task.getResult();
+                                                        message.setSenderName(senderDoc.getData().get("name").toString());
+
+                                                        /*
+                                                        * the id generated from add does not automatically
+                                                        * have a timestamp as in push() from realtime database
+                                                        */
+                                                        db.collection("chats").document(chatId(user.getPhoneNumber(), chat.getToPhone()))
+                                                                .collection("messages")
+                                                                .add(message);
+                                                        mTextbox.setText("");
+                                                    }
+                                                }
+                                            });
+                                }
+                            });
                 }
             }
         });
+    }
+
+    public String chatId(String sender, String receiver) {
+
+        String chatId;
+
+        /*
+        * The result is positive
+        * if the first string is lexicographically greater than the second string
+        * else the result would be negative
+        * */
+        if(sender.compareTo(receiver) > 0 ){
+            chatId = sender+receiver;
+        }else {
+            chatId = receiver+sender;
+        }
+
+        return chatId;
+    }
+
+    private void retrieveMessages(){
+        Query query = db.collection("chats").document(chatId(user.getPhoneNumber(), chat.getToPhone()))
+                .collection("messages");
+        registration = query.addSnapshotListener(new EventListener<QuerySnapshot>() {
+            @Override
+            public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
+                if (e != null) {
+                    Log.w(TAG, "listen:error", e);
+                    return;
+                }
+
+                for (DocumentChange dc : queryDocumentSnapshots.getDocumentChanges()) {
+                    switch (dc.getType()) {
+                        case ADDED:
+                            Log.d(TAG, "New city: " + dc.getDocument().getData());
+                            Map<String, Object> doc =dc.getDocument().getData();
+                            Message message = new Message();
+                            message.setSenderName(doc.get("senderName").toString());
+                            message.setTextMessage(doc.get("textMessage").toString());
+                            message.setIdSender(doc.get("idSender").toString());
+                            message.setTimestamp((Long) doc.get("timestamp"));
+                            messageList.add(message);
+                            mMessageAdapter.notifyDataSetChanged();
+                            break;
+                        case MODIFIED:
+                            Log.d(TAG, "Modified city: " + dc.getDocument().getData());
+                            break;
+                        case REMOVED:
+                            Log.d(TAG, "Removed city: " + dc.getDocument().getData());
+                            break;
+                    }
+            }
+        }
+        /*.get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+
+                        messageList.clear();
+
+                        if (task.isSuccessful()) {
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+
+                                Map<String, Object> doc =document.getData();
+
+                                Message message = new Message();
+                                message.setSenderName(doc.get("senderName").toString());
+                                message.setTextMessage(doc.get("textMessage").toString());
+                                message.setIdSender(doc.get("idSender").toString());
+                                message.setTimestamp((Long) doc.get("timestamp"));
+
+                                messageList.add(message);
+                            }
+                        }
+                    }
+                });*/
+            });
     }
 
     //on clicking back button finish activity and go back
@@ -84,5 +226,35 @@ public class MessageActivity extends AppCompatActivity  {
     public boolean onSupportNavigateUp(){
         finish();
         return true;
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        registration.remove();
+    }
+
+    /**
+     * Dispatch onPause() to fragments.
+     */
+    @Override
+    protected void onPause() {
+        super.onPause();
+        registration.remove();
+    }
+
+    /**
+     * Dispatch onResume() to fragments.  Note that for better inter-operation
+     * with older versions of the platform, at the point of this call the
+     * fragments attached to the activity are <em>not</em> resumed.
+     */
+    @Override
+    protected void onResume() {
+        super.onResume();
     }
 }

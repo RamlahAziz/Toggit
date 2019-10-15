@@ -10,6 +10,9 @@ import android.widget.TextView;
 
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -24,6 +27,8 @@ public class MessageListAdapter extends RecyclerView.Adapter {
 
     //get current user
     private String phone_Number;
+    private FirebaseAuth mauth = FirebaseAuth.getInstance();
+    private FirebaseUser user = mauth.getCurrentUser();
 
     public MessageListAdapter(Context context, List<Message> messageList) {
 
@@ -56,8 +61,7 @@ public class MessageListAdapter extends RecyclerView.Adapter {
         Log.d("testing0 messageAdaper", "inside messageListAdapter");
 
         Message message =  mMessageList.get(position);
-
-        //phone_Number get phone number
+        phone_Number = user.getPhoneNumber();
 
         if (message.getIdSender().equals(phone_Number)) {
             // If the current user is the sender of the message

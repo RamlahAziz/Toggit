@@ -58,7 +58,7 @@ public class ContactsLists extends Activity{
                 startActivity(intent);
             }
         });
-        
+
         mAdapter.notifyDataSetChanged();
     }
 
