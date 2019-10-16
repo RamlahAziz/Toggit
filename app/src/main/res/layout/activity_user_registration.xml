@@ -4,30 +4,21 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:background="@drawable/background02"
+    android:gravity="center"
     tools:context=".UserRegistration">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Profile info"
-        android:textSize="20sp"
-        android:padding="16dp"
-        android:layout_gravity="center_horizontal"
-        android:textColor="@color/design_default_color_primary"/>
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Please provide your name. It will be used for identification purposes"
-        android:layout_gravity="center_horizontal"
-        android:gravity="center_horizontal"
-        android:padding="16dp"
-        />
+    <ImageView
+        android:layout_width="215dp"
+        android:layout_height="153dp"
+        android:layout_marginTop="230dp"
+        android:src="@drawable/registration01" />
 
     <com.google.android.material.textfield.TextInputLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="16dp"
-        android:hint="Full Name">
+        android:hint="Enter Your Name">
         <com.google.android.material.textfield.TextInputEditText
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -36,19 +27,36 @@
 
     </com.google.android.material.textfield.TextInputLayout>
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1">
+    <RelativeLayout
+        android:id="@+id/id_of_foot"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:orientation="horizontal"
+        android:layout_weight="1"
+        android:layout_alignParentBottom="true"
+        android:gravity="bottom">
+
+        <ImageView
+            android:id="@+id/id_of_logo"
+            android:layout_width="126dp"
+            android:layout_height="60dp"
+            android:layout_alignParentBottom="true"
+            android:layout_marginLeft="-10dp"
+            android:layout_marginBottom="16dp"
+            android:src="@drawable/logo_thumb" />
+
         <Button
             android:id="@+id/nextButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="16dp"
-            android:text="next"
             style="@style/Widget.AppCompat.Button.Colored"
-            android:layout_gravity="bottom|end"/>
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentBottom="true"
+            android:layout_margin="16dp"
+            android:text="@string/next"
+            android:textColor="#FC000000" />
 
-    </LinearLayout>
+    </RelativeLayout>
 
 </LinearLayout>
