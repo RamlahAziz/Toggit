@@ -4,15 +4,13 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="@drawable/background02"
     android:gravity="center"
     tools:context=".UserRegistration">
 
     <ImageView
         android:layout_width="215dp"
         android:layout_height="153dp"
-        android:layout_marginTop="230dp"
-        android:src="@drawable/registration01" />
+        android:layout_marginTop="230dp" />
 
     <com.google.android.material.textfield.TextInputLayout
         android:layout_width="match_parent"
@@ -43,8 +41,7 @@
             android:layout_height="60dp"
             android:layout_alignParentBottom="true"
             android:layout_marginLeft="-10dp"
-            android:layout_marginBottom="16dp"
-            android:src="@drawable/logo_thumb" />
+            android:layout_marginBottom="16dp"/>
 
         <Button
             android:id="@+id/nextButton"
