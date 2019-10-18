@@ -13,6 +13,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
+import com.firebase.ui.auth.AuthUI;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
@@ -20,14 +21,17 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.Query;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.strigiformes.teletalk.CustomObjects.LastMessage;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -50,7 +54,7 @@ public class MessageActivity extends AppCompatActivity  {
     private FirebaseUser user = mauth.getCurrentUser();
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-    ListenerRegistration registration;
+    ListenerRegistration listenerRegistration;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -108,14 +112,16 @@ public class MessageActivity extends AppCompatActivity  {
                                 public void onComplete(@NonNull Task<DocumentSnapshot> task) {
 
                                     final Message message = new Message();
+                                    message.setTextMessage(mTextbox.getText().toString());
+                                    mTextbox.setText("");
 
                                     if (task.isSuccessful()) {
                                         DocumentSnapshot receiverDoc = task.getResult();
                                         message.setTokenReceiver(receiverDoc.getData().get("tokenId").toString());
-                                        message.setTextMessage(mTextbox.getText().toString());
                                         message.setIdSender(user.getPhoneNumber());
                                         message.setIdReceiver(chat.getToPhone());
                                         message.setTimestamp(System.currentTimeMillis());
+                                        message.setReceiverName(chat.getName());
                                     }
 
                                     db.collection("users").document(user.getPhoneNumber()).get()
@@ -133,7 +139,9 @@ public class MessageActivity extends AppCompatActivity  {
                                                         db.collection("chats").document(chatId(user.getPhoneNumber(), chat.getToPhone()))
                                                                 .collection("messages")
                                                                 .add(message);
-                                                        mTextbox.setText("");
+
+
+                                                        addToUserDocument(message);
                                                     }
                                                 }
                                             });
@@ -165,7 +173,7 @@ public class MessageActivity extends AppCompatActivity  {
     private void retrieveMessages(){
         Query query = db.collection("chats").document(chatId(user.getPhoneNumber(), chat.getToPhone()))
                 .collection("messages");
-        registration = query.addSnapshotListener(new EventListener<QuerySnapshot>() {
+        listenerRegistration = query.addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
                 if (e != null) {
@@ -221,6 +229,15 @@ public class MessageActivity extends AppCompatActivity  {
             });
     }
 
+    private void addToUserDocument(Message message){
+
+        String chatID = chatId(user.getPhoneNumber(), chat.getToPhone());
+        db.collection("users").document(user.getPhoneNumber())
+                .collection("userchats").document(chatID).set(message);
+        db.collection("users").document(chat.getToPhone())
+                .collection("userchats").document(chatID).set(message);
+    }
+
     //on clicking back button finish activity and go back
     @Override
     public boolean onSupportNavigateUp(){
@@ -236,7 +253,7 @@ public class MessageActivity extends AppCompatActivity  {
     @Override
     protected void onStop() {
         super.onStop();
-        registration.remove();
+        listenerRegistration.remove();
     }
 
     /**
@@ -245,7 +262,7 @@ public class MessageActivity extends AppCompatActivity  {
     @Override
     protected void onPause() {
         super.onPause();
-        registration.remove();
+        listenerRegistration.remove();
     }
 
     /**

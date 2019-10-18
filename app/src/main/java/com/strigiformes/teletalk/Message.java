@@ -15,6 +15,7 @@ public class Message {
     private String time;
     private String tokenReceiver;
     private String senderName;
+    private String receiverName;
 
     public Message() {
     }
@@ -83,6 +84,14 @@ public class Message {
         this.senderName = senderName;
     }
 
+    public String getReceiverName() {
+        return receiverName;
+    }
+
+    public void setReceiverName(String receiverName) {
+        this.receiverName = receiverName;
+    }
+
     @Override
     public String toString() {
         return "Message{" +
@@ -94,6 +103,7 @@ public class Message {
                 ", time='" + time + '\'' +
                 ", tokenReceiver='" + tokenReceiver + '\'' +
                 ", senderName='" + senderName + '\'' +
+                ", receiverName='" + receiverName + '\'' +
                 '}';
     }
 }

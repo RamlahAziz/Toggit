@@ -19,7 +19,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import java.util.Arrays;
 
 
-//this implements the firebase registration process
+//this implements the firebase listenerRegistration process
 //it goes to the welcome screens after this
 public class MainActivity extends AppCompatActivity {
 
@@ -67,7 +67,7 @@ public class MainActivity extends AppCompatActivity {
 
                                         /*
                                          * if the user is already registered direct them to HomeActivity
-                                         * otherwise direct them to the registration page
+                                         * otherwise direct them to the listenerRegistration page
                                          * */
 
                                         if (task.isSuccessful()) {

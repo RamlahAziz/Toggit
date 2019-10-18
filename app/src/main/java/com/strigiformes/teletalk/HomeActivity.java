@@ -1,5 +1,7 @@
 package com.strigiformes.teletalk;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
@@ -13,15 +15,31 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.Button;
 import android.widget.ListView;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentChange;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.ListenerRegistration;
+import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
+import com.strigiformes.teletalk.CustomObjects.User;
+
+import org.w3c.dom.Document;
 
 //Home screen of our app
 //This displays a list of current chats user has
@@ -29,13 +47,20 @@ import com.google.firebase.auth.FirebaseAuth;
 //new chat button in bottom right corner
 public class HomeActivity extends AppCompatActivity {
 
+    private String TAG = "HomeActivity";
+
     private String phone_Number;
     private ListView mListView;
     private View mNoChatsLayout;
     private List<ChatListItem> chatsList = new ArrayList<ChatListItem>();
     private FloatingActionButton fab;
+    ChatListAdapter mAdapter;
 
-    private Button mSignOut;
+    private FirebaseAuth mauth = FirebaseAuth.getInstance();
+    private FirebaseUser user = mauth.getCurrentUser();
+    private final FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+    ListenerRegistration listenerRegistration;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,10 +74,11 @@ public class HomeActivity extends AppCompatActivity {
         mListView = findViewById(R.id.list_view);
         mNoChatsLayout = findViewById(R.id.noChatsLayout);
         fab = findViewById(R.id.fab);
-        mSignOut = (Button) findViewById(R.id.action_logout);
 
-        //mAdapter = new ChatListAdapter(MainChat.this, R.layout.activity_home, chatsList);
-        //mListView.setAdapter(mAdapter);
+        showChats();
+
+         mAdapter = new ChatListAdapter(HomeActivity.this, R.layout.activity_home, chatsList);
+         mListView.setAdapter(mAdapter);
 
         //Open selected chat
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener(){
@@ -144,7 +170,7 @@ public class HomeActivity extends AppCompatActivity {
                 break;
 
             case R.id.action_logout:
-                signOut(mSignOut);
+                signOut();
                 break;
 
         }
@@ -152,20 +178,221 @@ public class HomeActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private void signOut(Button button){
-        button.setOnClickListener(new View.OnClickListener() {
+    private void showChats(){
+
+        Query query = db.collection("users").document(user.getPhoneNumber())
+                .collection("userchats");
+        listenerRegistration = query.addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
-            public void onClick(View view) {
-                // [START auth_sign_out]
+            public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
+                if (e != null) {
+                    Log.w(TAG, "listen:error", e);
+                    return;
+                }
+
+                for (DocumentChange dc : queryDocumentSnapshots.getDocumentChanges()) {
+                    switch (dc.getType()) {
+                        case ADDED:
+
+                            Map<String, Object> doc =dc.getDocument().getData();
+                            Log.d(TAG, "New chat: " + doc);
+                            ChatListItem chatListItem = new ChatListItem();
+                            chatListItem.setToPhone(Objects.requireNonNull(doc.get("idReceiver")).toString());
+                            chatListItem.setFromPhone(Objects.requireNonNull(doc.get("idSender")).toString());
+                            chatListItem.setChatId(dc.getDocument().getId());
+                            chatListItem.setMsgPreview(Objects.requireNonNull(doc.get("textMessage")).toString());
+
+                            if(user.getPhoneNumber().equals(chatListItem.getFromPhone())){
+                                chatListItem.setName(Objects.requireNonNull(doc.get("receiverName")).toString());
+                            } else{
+                                chatListItem.setName(Objects.requireNonNull(doc.get("senderName")).toString());
+                            }
+
+                            chatsList.add(chatListItem);
+                            mAdapter.notifyDataSetChanged();
+                            break;
+                        case MODIFIED:
+                            Log.d(TAG, "Modified city: " + dc.getDocument().getData());
+                            break;
+                        case REMOVED:
+                            Log.d(TAG, "Removed city: " + dc.getDocument().getData());
+                            break;
+                    }
+                }
+            }
+        });
+
+        /*db.collection("users").document(user.getPhoneNumber())
+                .collection("userchats").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+
+                for(DocumentSnapshot doc: Objects.requireNonNull(task.getResult())){
+                    ChatListItem chatListItem = new ChatListItem();
+                    chatListItem.setToPhone(Objects.requireNonNull(doc.getData().get("idReceiver")).toString());
+                    chatListItem.setFromPhone(Objects.requireNonNull(doc.getData().get("idSender")).toString());
+                    chatListItem.setChatId(doc.getId());
+                    chatListItem.setMsgPreview(Objects.requireNonNull(doc.getData().get("textMessage")).toString());
+
+                    if(user.getPhoneNumber().equals(chatListItem.getFromPhone())){
+                        chatListItem.setName(Objects.requireNonNull(doc.getData().get("receiverName")).toString());
+                    } else{
+                        chatListItem.setName(Objects.requireNonNull(doc.getData().get("senderName")).toString());
+                    }
+
+                    chatsList.add(chatListItem);
+                    mAdapter.notifyDataSetChanged();
+
+                }
+                for(QueryDocumentSnapshot document : task.getResult()){
+                    databaseChatsList.add(document.getId());
+                }
+
+                Log.d("databasechats", databaseChatsList.toString());
+
+                List<String> phoneNumbers = new ArrayList<>();
+                for(String chat: databaseChatsList){
+                    String number = chat.replace(user.getPhoneNumber(), "");
+                    phoneNumbers.add(number);
+                }
+
+                for(String number: phoneNumbers){
+                    db.collection("users")
+                            .document(number).get()
+                            .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                @Override
+                                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                    DocumentSnapshot doc = task.getResult();
+
+                                    if(doc!=null){
+                                        final ChatListItem chatListItem = new ChatListItem();
+                                        chatListItem.setName(Objects.requireNonNull
+                                                (Objects.requireNonNull(doc.getData()).get("name")).toString());
+                                        chatListItem.setToPhone(doc.getId());
+                                        chatListItem.setFromPhone(user.getPhoneNumber());
+
+                                        String chatId = chatId(chatListItem.getFromPhone(), chatListItem.getToPhone());
+                                        chatListItem.setChatId(chatId);
+
+                                        //store msgs using timestamp to retrieve ordered msgs
+                                        db.collection("chats").document(chatId)
+                                                .collection("messages").orderBy("timestamp", Query.Direction.DESCENDING)
+                                                .limit(1).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                            @Override
+                                            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+
+                                                for(DocumentSnapshot documentSnapshot: Objects.requireNonNull(task.getResult()))
+                                                {
+                                                    if (documentSnapshot!=null) {
+                                                        chatListItem.setMsgPreview(Objects.requireNonNull(Objects
+                                                                .requireNonNull(documentSnapshot.getData())
+                                                                .get("textMessage")).toString());
+
+                                                        chatsList.add(chatListItem);
+                                                        mAdapter.notifyDataSetChanged();
+
+                                                    }
+                                                }
+                                            }
+                                        });
+
+                                    }
+                                }
+                            });
+                }
+
+            }
+        });*/
+        /*db.collection("users")
+                .document(Objects.requireNonNull(user.getPhoneNumber()))
+                .get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        DocumentSnapshot document = task.getResult();
+                        List<String> databaseChatsList = (List<String>) document.get("chats");
+
+                        Log.d("databasechats", databaseChatsList.toString());
+
+                        List<String> phoneNumbers = new ArrayList<>();
+                        for(String chat: databaseChatsList){
+                            String number = chat.replace(user.getPhoneNumber(), "");
+                            phoneNumbers.add(number);
+                        }
+
+                        for(String number: phoneNumbers){
+                            db.collection("users")
+                                    .document(number).get()
+                                    .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                @Override
+                                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                    DocumentSnapshot doc = task.getResult();
+
+                                    if(doc!=null){
+                                        final ChatListItem chatListItem = new ChatListItem();
+                                        chatListItem.setName(Objects.requireNonNull
+                                                (Objects.requireNonNull(doc.getData()).get("name")).toString());
+                                        chatListItem.setToPhone(doc.getId());
+                                        chatListItem.setFromPhone(user.getPhoneNumber());
+
+                                        String chatId = chatId(chatListItem.getFromPhone(), chatListItem.getToPhone());
+                                        chatListItem.setChatId(chatId);
+
+                                        //store msgs using timestamp to retrieve ordered msgs
+                                        db.collection("chats").document(chatId)
+                                                .collection("messages").orderBy("timestamp", Query.Direction.DESCENDING)
+                                                .limit(1).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                            @Override
+                                            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+
+                                                for(DocumentSnapshot documentSnapshot: Objects.requireNonNull(task.getResult()))
+                                                {
+                                                    if (documentSnapshot!=null) {
+                                                        chatListItem.setMsgPreview(Objects.requireNonNull(Objects
+                                                                .requireNonNull(documentSnapshot.getData())
+                                                                .get("textMessage")).toString());
+
+                                                        chatsList.add(chatListItem);
+                                                        mAdapter.notifyDataSetChanged();
+
+                                                    }
+                                                }
+                                            }
+                                        });
+
+                                    }
+                                }
+                            });
+                        }
+                    }
+                });*/
+    }
+
+    public String chatId(String sender, String receiver) {
+
+        String chatId;
+
+        /*
+         * The result is positive
+         * if the first string is lexicographically greater than the second string
+         * else the result would be negative
+         * */
+        if(sender.compareTo(receiver) > 0 ){
+            chatId = sender+receiver;
+        }else {
+            chatId = receiver+sender;
+        }
+
+        return chatId;
+    }
+
+    private void signOut(){
                 FirebaseAuth.getInstance().signOut();
                 // [END auth_sign_out]
 
                 finishAffinity();
 
-                Intent intent = new Intent(HomeActivity.this, MainActivity.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-                startActivity(intent);
-            }
-        });
+                Intent mainIntent = new Intent(HomeActivity.this, MainActivity.class);
+                startActivity(mainIntent);
     }
+
 }

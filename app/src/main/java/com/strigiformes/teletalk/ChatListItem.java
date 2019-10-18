@@ -12,6 +12,9 @@ public class ChatListItem implements Serializable {
     private String fromPhone;
     private String toPhone;
 
+    public ChatListItem() {
+    }
+
     public ChatListItem(String name, String toPhone) {
         this.name = name;
         this.toPhone = toPhone;

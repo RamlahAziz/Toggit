@@ -25,10 +25,7 @@
         <activity android:name=".UserRegistration" />
         <activity android:name=".HomeActivity"
             android:theme="@style/AppTheme.NoActionBar">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
+
             </activity>
         <activity android:name=".WelcomeActivity"></activity>
         <activity android:name=".MainActivity" />
@@ -36,7 +33,10 @@
             android:name=".SplashActivity"
             android:screenOrientation="portrait"
             android:theme="@style/SplashTheme">
-
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
         </activity>
     </application>
 
