@@ -2,7 +2,7 @@
 <resources>
     <color name="colorPrimary">#17BEBB</color>
     <color name="colorPrimaryDark">#118E8C</color>
-    <color name="colorAccent">#D81B60</color>
+    <color name="colorAccent">#BF0000</color>
     <color name="darkgrey">#777777</color>
     <color name="smokyBlack">#0A0908</color>
     <color name="maroon">#BF0000</color>
