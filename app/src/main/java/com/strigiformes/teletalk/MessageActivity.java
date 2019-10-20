@@ -22,12 +22,12 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
-import com.bumptech.glide.request.RequestOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
@@ -37,6 +37,11 @@ import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.SetOptions;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.OnProgressListener;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
+import com.strigiformes.teletalk.CustomObjects.Message;
 import com.strigiformes.teletalk.CustomObjects.User;
 
 import java.util.ArrayList;
@@ -44,6 +49,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.UUID;
 
 public class MessageActivity extends AppCompatActivity  {
 
@@ -162,6 +168,7 @@ public class MessageActivity extends AppCompatActivity  {
             //        .apply(RequestOptions.circleCropTransform().placeholder(R.drawable.ic_avatar)).into(mIDImage);
             //String imageid;
 
+            String fileId;
             if(data != null)
             {
                 String size = null;
@@ -198,6 +205,58 @@ public class MessageActivity extends AppCompatActivity  {
 
                         //uploading stuff HERE MARIA :D WE ALL LOVE YOU
                         //https://firebase.google.com/docs/storage/android/upload-files
+                        if(selectedFile != null)
+                        {
+
+                            if (groupChat) {
+                                fileId="ChatRooms/"+ groupName +"/"+ UUID.randomUUID().toString();
+                                Log.d("imagelink",fileId);
+                            } else {
+                                fileId="Chats/"+ chatId(user.getPhoneNumber(), chat.getToPhone()) +"/"+ UUID.randomUUID().toString();
+                                Log.d("imagelink",fileId);
+                            }
+
+                            final StorageReference ref = FirebaseStorage.getInstance().getReference().child(fileId);
+                            ref.putFile(selectedFile)
+                                    .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                                        @Override
+                                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                                            ref.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                                                @Override
+                                                public void onSuccess(Uri uri) {
+                                                    Log.d("Driver Upload", "onSuccess: uri= "+ uri.toString());
+
+                                                    Message message = new Message();
+                                                    message.setTextMessage(uri.toString());
+                                                    message.setFile(true);
+
+                                                    makeMessage(message);
+                                                    /*DatabaseReference mRef = FirebaseDatabase.getInstance().getReference().child("Customer");
+                                                    mRef.child(phone_Number).child("idImage").setValue(uri.toString());*/
+
+                                                }
+                                            });
+                                            Task<Uri> urlTask=taskSnapshot.getStorage().getDownloadUrl();
+
+                                            while(!urlTask.isSuccessful()){
+
+                                            }
+
+                                        }
+                                    })
+
+                                    .addOnFailureListener(new OnFailureListener() {
+                                        @Override
+                                        public void onFailure(@NonNull Exception e) {
+                                        }
+                                    })
+
+                                    .addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
+                                        @Override
+                                        public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
+                                        }
+                                    });
+                        }
                     }
                     else {
                         Toast.makeText(getApplicationContext(),
@@ -260,6 +319,49 @@ public class MessageActivity extends AppCompatActivity  {
         return size;
     }
 
+    private void makeMessage(Message m){
+
+        final Message message = m;
+        //database call needed to get the receiver's token id so notification can be sent
+        db.collection("users").document(chat.getToPhone()).get()
+                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+
+                        if (task.isSuccessful()) {
+                            DocumentSnapshot receiverDoc = task.getResult();
+                            message.setTokenReceiver(receiverDoc.getData().get("tokenId").toString());
+                            message.setIdSender(user.getPhoneNumber());
+                            message.setIdReceiver(chat.getToPhone());
+                            message.setTimestamp(System.currentTimeMillis());
+                            message.setReceiverName(chat.getName());
+                        }
+
+                        db.collection("users").document(user.getPhoneNumber()).get()
+                                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                        if (task.isSuccessful()) {
+                                            DocumentSnapshot senderDoc = task.getResult();
+                                            message.setSenderName(senderDoc.getData().get("name").toString());
+
+                                            /*
+                                             * the id generated from add does not automatically
+                                             * have a timestamp as in push() from realtime database
+                                             */
+                                            db.collection("chats").document(chatId(user.getPhoneNumber(), chat.getToPhone()))
+                                                    .collection("messages")
+                                                    .add(message);
+
+
+                                            addToUserDocument(message);
+                                        }
+                                    }
+                                });
+                    }
+                });
+    }
+
     private void sendMessage(Button button){
 
         button.setOnClickListener(new View.OnClickListener() {
@@ -272,44 +374,8 @@ public class MessageActivity extends AppCompatActivity  {
 
                 if (message.getTextMessage().length() > 0) {
 
-                    //database call needed to get the receiver's token id so notification can be sent
-                    db.collection("users").document(chat.getToPhone()).get()
-                            .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                                @Override
-                                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                    makeMessage(message);
 
-                                    if (task.isSuccessful()) {
-                                        DocumentSnapshot receiverDoc = task.getResult();
-                                        message.setTokenReceiver(receiverDoc.getData().get("tokenId").toString());
-                                        message.setIdSender(user.getPhoneNumber());
-                                        message.setIdReceiver(chat.getToPhone());
-                                        message.setTimestamp(System.currentTimeMillis());
-                                        message.setReceiverName(chat.getName());
-                                    }
-
-                                    db.collection("users").document(user.getPhoneNumber()).get()
-                                            .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                                                @Override
-                                                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                                                    if (task.isSuccessful()) {
-                                                        DocumentSnapshot senderDoc = task.getResult();
-                                                        message.setSenderName(senderDoc.getData().get("name").toString());
-
-                                                        /*
-                                                        * the id generated from add does not automatically
-                                                        * have a timestamp as in push() from realtime database
-                                                        */
-                                                        db.collection("chats").document(chatId(user.getPhoneNumber(), chat.getToPhone()))
-                                                                .collection("messages")
-                                                                .add(message);
-
-
-                                                        addToUserDocument(message);
-                                                    }
-                                                }
-                                            });
-                                }
-                            });
                 }
             }
         });

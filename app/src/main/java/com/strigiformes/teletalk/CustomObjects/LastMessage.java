@@ -1,7 +1,5 @@
 package com.strigiformes.teletalk.CustomObjects;
 
-import com.strigiformes.teletalk.Message;
-
 public class LastMessage {
 
     private Message lastMsg;

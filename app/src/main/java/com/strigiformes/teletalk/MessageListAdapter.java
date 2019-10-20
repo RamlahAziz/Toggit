@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.strigiformes.teletalk.CustomObjects.Message;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;

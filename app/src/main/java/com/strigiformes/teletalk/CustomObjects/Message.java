@@ -1,4 +1,4 @@
-package com.strigiformes.teletalk;
+package com.strigiformes.teletalk.CustomObjects;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -16,6 +16,7 @@ public class Message {
     private String tokenReceiver;
     private String senderName;
     private String receiverName;
+    private Boolean isFile = false;
 
     public Message() {
     }
@@ -92,6 +93,14 @@ public class Message {
         this.receiverName = receiverName;
     }
 
+    public Boolean getFile() {
+        return isFile;
+    }
+
+    public void setFile(Boolean file) {
+        isFile = file;
+    }
+
     @Override
     public String toString() {
         return "Message{" +
@@ -104,6 +113,7 @@ public class Message {
                 ", tokenReceiver='" + tokenReceiver + '\'' +
                 ", senderName='" + senderName + '\'' +
                 ", receiverName='" + receiverName + '\'' +
+                ", isFile=" + isFile +
                 '}';
     }
 }

@@ -40,7 +40,7 @@ public class AddGroupName extends Activity {
     private FirebaseUser user = mauth.getCurrentUser();
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-    Button doneButton;
+    private Button doneButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState){
