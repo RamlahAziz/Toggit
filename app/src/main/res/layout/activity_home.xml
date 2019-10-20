@@ -25,7 +25,8 @@
     <androidx.coordinatorlayout.widget.CoordinatorLayout
 
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:layout_marginTop="50dp">
 
         <!--to be displayed when user has no chats in the beginning
         a pretty picture and some text-->
@@ -59,7 +60,8 @@
             android:paddingStart="16dp"
             android:paddingLeft="16dp"
             android:paddingRight="16dp"
-            android:paddingEnd="16dp">
+            android:paddingEnd="16dp"
+            android:descendantFocusability="blocksDescendants">
 
             <!--actual list of chats. implementation is in java-->
             <ListView
@@ -69,12 +71,6 @@
                 android:divider="@null"
                 android:dividerHeight="0dp"/>
         </LinearLayout>
-
-        <ListView
-            android:id="@+id/chats"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
-
             <!--new chats button-->
         <com.google.android.material.floatingactionbutton.FloatingActionButton
                 android:layout_marginRight="16dp"

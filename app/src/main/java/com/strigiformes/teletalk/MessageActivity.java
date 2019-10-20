@@ -6,13 +6,21 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.app.Activity;
 import android.content.Intent;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
+import android.provider.OpenableColumns;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.Toast;
 
+import com.bumptech.glide.request.RequestOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
@@ -37,6 +45,7 @@ public class MessageActivity extends AppCompatActivity  {
     private RecyclerView mMessageRecycler;
     private MessageListAdapter mMessageAdapter;
     private Button mSendButton;
+    private ImageButton mAttachButton;
     private EditText mTextbox;
     private View mNoMessageLayout;
 
@@ -49,7 +58,9 @@ public class MessageActivity extends AppCompatActivity  {
     private FirebaseUser user = mauth.getCurrentUser();
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-    ListenerRegistration listenerRegistration;
+    private static final int GET_FROM_PHONE = 1;
+
+    private ListenerRegistration listenerRegistration;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,11 +83,26 @@ public class MessageActivity extends AppCompatActivity  {
          * */
 
         mMessageRecycler = (RecyclerView) findViewById(R.id.reyclerview_message_list);
-
+        mAttachButton = findViewById(R.id.attach_button);
         mSendButton =  findViewById(R.id.button_chatbox_send);
         mTextbox =  findViewById(R.id.edittext_chatbox);
         mNoMessageLayout = findViewById(R.id.noMessageLayout);
 
+
+        mAttachButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                //calls gallery
+                Intent addFile = new Intent(Intent.ACTION_GET_CONTENT, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                addFile.addCategory(Intent.CATEGORY_OPENABLE);
+                //addFile.setType("image/jpeg,image/png,image/jpg");
+                //
+                //if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                //    addFile.putExtra(Intent.EXTRA_MIME_TYPES,mimeTypes);
+                //}
+                startActivityForResult(addFile, GET_FROM_PHONE);
+            }
+        });
 
         mMessageAdapter = new MessageListAdapter(MessageActivity.this, messageList);
 
@@ -91,6 +117,89 @@ public class MessageActivity extends AppCompatActivity  {
 
         retrieveMessages();
 
+    }
+
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        //Detects request codes
+        if(requestCode==GET_FROM_PHONE && resultCode == Activity.RESULT_OK) {
+            Uri selectedFile = null;
+
+            //new RequestOptions();
+            //Glide.with(ProfileDisplay.this)
+            //        .load(selectedFile)
+            //        .apply(RequestOptions.circleCropTransform().placeholder(R.drawable.ic_avatar)).into(mIDImage);
+            //String imageid;
+
+            if(data != null)
+            {
+                String size = null;
+                selectedFile =data.getData();
+                Log.i(TAG, "Uri: " + selectedFile.toString());
+                size = getFileSize(selectedFile);
+
+                if (!size.equalsIgnoreCase("unknown")){
+                    if(Integer.valueOf(size)<20971520){
+                        //show file
+                        Log.d(TAG, "I'm less than 20 mb");
+
+                        //uploading stuff
+                        //https://firebase.google.com/docs/storage/android/upload-files
+                    }
+                    else {
+                        Toast.makeText(getApplicationContext(),
+                                "Choose a file less than 20MB", Toast.LENGTH_SHORT)
+                                .show();
+                    }
+                }
+                else {
+                    Toast.makeText(getApplicationContext(),
+                            "This file is not supported, sorry", Toast.LENGTH_SHORT)
+                            .show();
+
+                }
+
+            }
+
+        }
+
+    }
+
+    public String getFileSize(Uri uri) {
+
+        String size = null;
+        // The query, since it only applies to a single document, will only return
+        // one row. There's no need to filter, sort, or select fields, since we want
+        // all fields for one document.
+        Cursor cursor = getContentResolver()
+                .query(uri, null, null, null, null, null);
+
+        try {
+            // moveToFirst() returns false if the cursor has 0 rows.  Very handy for
+            // "if there's anything to look at, look at it" conditionals.
+            if (cursor != null && cursor.moveToFirst()) {
+
+                int sizeIndex = cursor.getColumnIndex(OpenableColumns.SIZE);
+                // If the size is unknown, the value stored is null.  But since an
+                // int can't be null in Java, the behavior is implementation-specific,
+                // which is just a fancy term for "unpredictable".  So as
+                // a rule, check if it's null before assigning to an int.  This will
+                // happen often:  The storage API allows for remote files, whose
+                // size might not be locally known.
+                if (!cursor.isNull(sizeIndex)) {
+                    // Technically the column stores an int, but cursor.getString()
+                    // will do the conversion automatically.
+                    size = cursor.getString(sizeIndex);
+                } else {
+                    size = "Unknown";
+                }
+                Log.i(TAG, "Size: " + size);
+            }
+        } finally {
+            cursor.close();
+        }
+        return size;
     }
 
     private void sendMessage(Button button){

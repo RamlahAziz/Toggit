@@ -135,6 +135,12 @@ public class HomeActivity extends AppCompatActivity {
         });
     }
 
+    //cannot go back to previous activity, closes down app to background
+    @Override
+    public void onBackPressed() {
+        moveTaskToBack(true);
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
