@@ -7,6 +7,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
@@ -25,6 +27,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
@@ -59,6 +62,7 @@ public class MessageActivity extends AppCompatActivity  {
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
 
     private static final int GET_FROM_PHONE = 1;
+    private String mFileName;
 
     private ListenerRegistration listenerRegistration;
 
@@ -96,7 +100,6 @@ public class MessageActivity extends AppCompatActivity  {
                 Intent addFile = new Intent(Intent.ACTION_GET_CONTENT, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
                 addFile.addCategory(Intent.CATEGORY_OPENABLE);
                 //addFile.setType("image/jpeg,image/png,image/jpg");
-                //
                 //if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
                 //    addFile.putExtra(Intent.EXTRA_MIME_TYPES,mimeTypes);
                 //}
@@ -122,6 +125,7 @@ public class MessageActivity extends AppCompatActivity  {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
+
         //Detects request codes
         if(requestCode==GET_FROM_PHONE && resultCode == Activity.RESULT_OK) {
             Uri selectedFile = null;
@@ -139,12 +143,34 @@ public class MessageActivity extends AppCompatActivity  {
                 Log.i(TAG, "Uri: " + selectedFile.toString());
                 size = getFileSize(selectedFile);
 
+
+                //Get popup dialog ready to confirm if user want to send file
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setMessage("Send \""+ mFileName+"\" to \""+chat.getName()+"\"?");
+                builder.setPositiveButton("SEND", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                    }
+                });
+                builder.setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                });
+
+
                 if (!size.equalsIgnoreCase("unknown")){
                     if(Integer.valueOf(size)<20971520){
-                        //show file
+
+                        //WRITE CODE TO show file HERE
                         Log.d(TAG, "I'm less than 20 mb");
 
-                        //uploading stuff
+                        //show the dialog
+                        builder.show();
+
+                        //uploading stuff HERE MARIA :D WE ALL LOVE YOU
                         //https://firebase.google.com/docs/storage/android/upload-files
                     }
                     else {
@@ -179,6 +205,12 @@ public class MessageActivity extends AppCompatActivity  {
             // moveToFirst() returns false if the cursor has 0 rows.  Very handy for
             // "if there's anything to look at, look at it" conditionals.
             if (cursor != null && cursor.moveToFirst()) {
+
+                // Note it's called "Display Name".  This is
+                // provider-specific, and might not necessarily be the file name.
+                mFileName = cursor.getString(
+                        cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME));
+                Log.i(TAG, "Display Name: " + mFileName);
 
                 int sizeIndex = cursor.getColumnIndex(OpenableColumns.SIZE);
                 // If the size is unknown, the value stored is null.  But since an
