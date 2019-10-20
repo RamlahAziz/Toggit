@@ -21,6 +21,7 @@ import com.strigiformes.teletalk.CustomObjects.User;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -65,10 +66,15 @@ public class AddGroupName extends Activity {
                 groupName = mGroupName.getText().toString();
                 if(groupName != null && !groupName.isEmpty()){
 
+                    User[] userArray = groupList.toArray(new User[0]);
+                    List<User> membersList = Arrays.asList(userArray);
+                    Map<String, Object> members = new HashMap<>();
+                    members.put("members", groupList);
+
                     Log.d(TAG,"groupname LENGTH IS greater than 0 MARIA");
                     //Create Chatroom
                     db.collection("ChatRooms").document(groupName)
-                            .set(groupList)
+                            .set(members)
                             .addOnSuccessListener(new OnSuccessListener<Void>() {
                                 @Override
                                 public void onSuccess(Void aVoid) {
@@ -85,7 +91,7 @@ public class AddGroupName extends Activity {
                     //Add Chat room to each member's account in the database
                     for(User member: groupList){
                         db.collection("users").document(member.getPhoneNumber())
-                                .collection("ChatRooms").document(groupName).set(groupList)
+                                .collection("ChatRooms").document(groupName).set(members)
                                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                                     @Override
                                     public void onSuccess(Void aVoid) {

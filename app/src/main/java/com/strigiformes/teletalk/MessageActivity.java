@@ -89,8 +89,8 @@ public class MessageActivity extends AppCompatActivity  {
         chat = (ChatListItem) i.getSerializableExtra("CHAT");
         groupList = (List<User>) getIntent().getExtras().getSerializable("CONTACTS");
         groupName = (String) getIntent().getExtras().getSerializable("GROUP_NAME");
-        if(getIntent().getExtras().getSerializable("GROUPCHAT") != null){
-            groupChat = (Boolean) getIntent().getExtras().getSerializable("GROUPCHAT");
+        if(getIntent().getExtras().getSerializable("GROUP_CHAT") != null){
+            groupChat = (Boolean) getIntent().getExtras().getSerializable("GROUP_CHAT");
         }
 
         assert getSupportActionBar() != null;   //null check
