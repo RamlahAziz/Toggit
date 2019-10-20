@@ -23,6 +23,7 @@ import com.strigiformes.teletalk.CustomObjects.User;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class ContactsLists extends Activity{
 
@@ -71,7 +72,7 @@ public class ContactsLists extends Activity{
         Cursor phones = getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null,null,null, null);
         while (phones.moveToNext())
         {
-            String name=phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
+            //String name=phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
             String phoneNo = phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
 
             //remove white spaces
@@ -97,12 +98,13 @@ public class ContactsLists extends Activity{
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                 if (task.isSuccessful()) {
-                    for (QueryDocumentSnapshot document : task.getResult()) {
+                    for (QueryDocumentSnapshot document : Objects.requireNonNull(task.getResult())) {
                         if(phoneContacts.contains(document.getId())){
 
                             User user = new User();
-                            user.setName(document.getData().get("name").toString());
+                            user.setName(Objects.requireNonNull(document.getData().get("name")).toString());
                             user.setPhoneNumber(document.getId());
+                            user.setDeviceToken(Objects.requireNonNull(document.getData().get("tokenId")).toString());
 
                             appContacts.add(user);
                             mAdapter.notifyDataSetChanged();
@@ -124,4 +126,5 @@ public class ContactsLists extends Activity{
         groupIntent.putExtras(bundle);
         startActivity(groupIntent);
     }
-    }
+
+}

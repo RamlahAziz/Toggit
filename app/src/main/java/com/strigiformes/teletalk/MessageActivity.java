@@ -25,10 +25,14 @@ import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.firestore.SetOptions;
+import com.strigiformes.teletalk.CustomObjects.User;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 public class MessageActivity extends AppCompatActivity  {
 
@@ -49,6 +53,11 @@ public class MessageActivity extends AppCompatActivity  {
     private FirebaseUser user = mauth.getCurrentUser();
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
 
+    //For Group chat rooms
+    List<User> groupList = new ArrayList<User>();
+    private String groupName;
+    Boolean groupChat = false;
+
     ListenerRegistration listenerRegistration;
 
     @Override
@@ -58,10 +67,22 @@ public class MessageActivity extends AppCompatActivity  {
 
         Intent i = getIntent();
         chat = (ChatListItem) i.getSerializableExtra("CHAT");
+        groupList = (List<User>) getIntent().getExtras().getSerializable("CONTACTS");
+        groupName = (String) getIntent().getExtras().getSerializable("GROUP_NAME");
+        if(getIntent().getExtras().getSerializable("GROUPCHAT") != null){
+            groupChat = (Boolean) getIntent().getExtras().getSerializable("GROUPCHAT");
+        }
 
         assert getSupportActionBar() != null;   //null check
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);   //show back button
-        setTitle(chat.getName());
+
+        if(groupChat){
+            setTitle(groupName);
+
+        } else{
+            setTitle(chat.getName());
+        }
+
 
         user = mauth.getCurrentUser();
 
@@ -87,9 +108,15 @@ public class MessageActivity extends AppCompatActivity  {
         mManager.setStackFromEnd(true);
         mMessageRecycler.setLayoutManager(mManager);
 
-        sendMessage(mSendButton);
+        if(groupChat){
+            sendGroupMessage(mSendButton);
+            retrieveGroupMessages();
+        }
+        else{
+            sendMessage(mSendButton);
+            retrieveChatMessages();
+        }
 
-        retrieveMessages();
 
     }
 
@@ -98,17 +125,18 @@ public class MessageActivity extends AppCompatActivity  {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String content = mTextbox.getText().toString().trim();
-                if (content.length() > 0) {
 
+                final Message message = new Message();
+                message.setTextMessage(mTextbox.getText().toString().trim());
+                mTextbox.setText("");
+
+                if (message.getTextMessage().length() > 0) {
+
+                    //database call needed to get the receiver's token id so notification can be sent
                     db.collection("users").document(chat.getToPhone()).get()
                             .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                                 @Override
                                 public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-
-                                    final Message message = new Message();
-                                    message.setTextMessage(mTextbox.getText().toString());
-                                    mTextbox.setText("");
 
                                     if (task.isSuccessful()) {
                                         DocumentSnapshot receiverDoc = task.getResult();
@@ -165,7 +193,31 @@ public class MessageActivity extends AppCompatActivity  {
         return chatId;
     }
 
-    private void retrieveMessages(){
+    private void retrieveMessages(QuerySnapshot queryDocumentSnapshots){
+        for (DocumentChange dc : queryDocumentSnapshots.getDocumentChanges()) {
+            switch (dc.getType()) {
+                case ADDED:
+                    Log.d(TAG, "New message: " + dc.getDocument().getData());
+                    Map<String, Object> doc =dc.getDocument().getData();
+                    Message message = new Message();
+                    message.setSenderName(doc.get("senderName").toString());
+                    message.setTextMessage(doc.get("textMessage").toString());
+                    message.setIdSender(doc.get("idSender").toString());
+                    message.setTimestamp((Long) doc.get("timestamp"));
+                    messageList.add(message);
+                    mMessageAdapter.notifyDataSetChanged();
+                    break;
+                case MODIFIED:
+                    Log.d(TAG, "Modified city: " + dc.getDocument().getData());
+                    break;
+                case REMOVED:
+                    Log.d(TAG, "Removed city: " + dc.getDocument().getData());
+                    break;
+            }
+        }
+    }
+
+    private void retrieveChatMessages(){
         Query query = db.collection("chats").document(chatId(user.getPhoneNumber(), chat.getToPhone()))
                 .collection("messages");
         listenerRegistration = query.addSnapshotListener(new EventListener<QuerySnapshot>() {
@@ -176,27 +228,8 @@ public class MessageActivity extends AppCompatActivity  {
                     return;
                 }
 
-                for (DocumentChange dc : queryDocumentSnapshots.getDocumentChanges()) {
-                    switch (dc.getType()) {
-                        case ADDED:
-                            Log.d(TAG, "New city: " + dc.getDocument().getData());
-                            Map<String, Object> doc =dc.getDocument().getData();
-                            Message message = new Message();
-                            message.setSenderName(doc.get("senderName").toString());
-                            message.setTextMessage(doc.get("textMessage").toString());
-                            message.setIdSender(doc.get("idSender").toString());
-                            message.setTimestamp((Long) doc.get("timestamp"));
-                            messageList.add(message);
-                            mMessageAdapter.notifyDataSetChanged();
-                            break;
-                        case MODIFIED:
-                            Log.d(TAG, "Modified city: " + dc.getDocument().getData());
-                            break;
-                        case REMOVED:
-                            Log.d(TAG, "Removed city: " + dc.getDocument().getData());
-                            break;
-                    }
-            }
+                assert queryDocumentSnapshots != null;
+                retrieveMessages(queryDocumentSnapshots);
         }
         /*.get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
@@ -231,6 +264,77 @@ public class MessageActivity extends AppCompatActivity  {
                 .collection("userchats").document(chatID).set(message);
         db.collection("users").document(chat.getToPhone())
                 .collection("userchats").document(chatID).set(message);
+    }
+
+    private void sendGroupMessage(Button button){
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                final Message message = new Message();
+                message.setTextMessage(mTextbox.getText().toString().trim());
+                mTextbox.setText("");
+
+                if (message.getTextMessage().length() > 0) {
+                    message.setIdSender(user.getPhoneNumber());
+                    message.setTimestamp(System.currentTimeMillis());
+
+                    db.collection("users").document(Objects.requireNonNull(user.getPhoneNumber())).get()
+                            .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                @Override
+                                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                    if (task.isSuccessful()) {
+                                        DocumentSnapshot senderDoc = task.getResult();
+                                        message.setSenderName(Objects.requireNonNull(Objects
+                                                .requireNonNull(Objects.requireNonNull(senderDoc)
+                                                .getData()).get("name")).toString());
+
+                                        /*
+                                         * the id generated from add does not automatically
+                                         * have a timestamp as in push() from realtime database
+                                         */
+
+                                        message.setThreadId(groupName);
+                                        db.collection("ChatRooms").document(groupName)
+                                                .collection("messages")
+                                                .add(message);
+
+                                        //add to last message received of every member
+                                        for(User member:groupList){
+                                            message.setIdReceiver(member.getPhoneNumber());
+                                            message.setReceiverName(member.getName());
+                                            message.setTokenReceiver(member.getDeviceToken());
+
+                                            Map<String, Object> data = new HashMap<>();
+                                            data.put("lastMessage", message);
+
+                                            db.collection("users").document(user.getPhoneNumber())
+                                                    .collection("ChatRooms").document(groupName)
+                                                    .set(data, SetOptions.merge());
+                                        }
+                                    }
+                                }
+                            });
+                }
+            }
+        });
+    }
+
+    private void retrieveGroupMessages(){
+        Query query = db.collection("ChatRooms").document(groupName)
+                .collection("messages");
+        listenerRegistration = query.addSnapshotListener(new EventListener<QuerySnapshot>() {
+            @Override
+            public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
+                if (e != null) {
+                    Log.w(TAG, "listen:error", e);
+                    return;
+                }
+
+                assert queryDocumentSnapshots != null;
+                retrieveMessages(queryDocumentSnapshots);
+            }
+        });
     }
 
     //on clicking back button finish activity and go back

@@ -1,5 +1,6 @@
 package com.strigiformes.teletalk;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.Activity;
@@ -15,6 +16,12 @@ import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.strigiformes.teletalk.CustomObjects.User;
 
 import java.io.Serializable;
@@ -28,6 +35,10 @@ public class SelectGroupContacts extends Activity {
     List<User> appContacts = new ArrayList<User>();
     List<User> group = new ArrayList<User>();
 
+    private FirebaseAuth mauth = FirebaseAuth.getInstance();
+    private FirebaseUser user = mauth.getCurrentUser();
+    private final FirebaseFirestore db = FirebaseFirestore.getInstance();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -35,6 +46,20 @@ public class SelectGroupContacts extends Activity {
 
         appContacts = (List<User>) getIntent().getExtras().getSerializable("CONTACTS");
         Log.d("groupContacts", appContacts.toString());
+
+        final User me = new User();
+        me.setPhoneNumber(user.getPhoneNumber());
+        db.collection("users").document(me.getPhoneNumber()).get()
+                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot senderDoc = task.getResult();
+                    me.setName(senderDoc.getData().get("name").toString());
+                    group.add(me);
+                }
+            }
+        });
 
         list = (ListView) findViewById(R.id.listview);
         listviewadapter = new CustomListAdapter(this, R.layout.contact_list_item,

@@ -60,7 +60,7 @@
         <com.google.android.material.textfield.TextInputEditText
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:id="@+id/grp_name_field"
+            android:id="@+id/group_name_field"
             android:inputType="textPersonName|textCapWords" />
 
     </com.google.android.material.textfield.TextInputLayout>
@@ -95,7 +95,7 @@
             android:layout_gravity="bottom|right"
             android:layout_margin="7dp"
             android:background="@drawable/rounded_rectangle_green"
-            android:text="DONE" />
+            android:text="DONE"/>
 
     </LinearLayout>
 </LinearLayout>
