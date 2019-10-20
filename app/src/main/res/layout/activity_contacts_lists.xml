@@ -5,35 +5,27 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:descendantFocusability="blocksDescendants">
-
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="50dp"
         android:orientation="horizontal"
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        android:descendantFocusability="blocksDescendants">
+        android:background="@color/colorPrimary"
+        android:padding="5dp">
         <ImageView
-            android:layout_width="60dp"
-            android:layout_height="60dp"
-            android:src='@drawable/userpic'
-            android:onClick="newChat"
-            android:clickable="true"/>
-
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@drawable/backarrow"
+            />
         <TextView
-            android:id="@+id/create_group"
-            android:padding="16dp"
             android:layout_width="match_parent"
-            android:layout_height="60dp"
-            android:text="New Group"
-            android:focusableInTouchMode="false"
-            android:textStyle="bold"
-            android:onClick="newChat"
-            android:clickable="true"/>
+            android:layout_height="wrap_content"
+            android:text="Select Contact"
+            android:textSize="30dp"
+            android:paddingLeft="25dp"
+            android:textColor="@color/white">
 
-
+        </TextView>
     </LinearLayout>
-
-
     <ListView
         android:id="@+id/contacts_list"
         android:layout_width="match_parent"

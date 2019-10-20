@@ -4,64 +4,90 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:paddingTop="16dp">
+    android:orientation="vertical">
 
-    <androidx.cardview.widget.CardView
-        android:id="@+id/cv"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="@dimen/cardview_compat_inset_shadow"
-        android:layout_marginStart="@dimen/cardview_compat_inset_shadow"
-        android:layout_marginRight="@dimen/cardview_default_elevation"
-        android:layout_marginEnd="@dimen/cardview_default_elevation"
-        android:layout_marginBottom="@dimen/cardview_default_elevation"
-        android:layout_marginTop="@dimen/cardview_compat_inset_shadow">
+        android:layout_height="65dp"
+        android:orientation="horizontal"
+        android:background="@color/colorPrimary"
+        android:padding="7dp">
 
-        <RelativeLayout
+        <ImageView
+            android:layout_width="75dp"
+            android:layout_height="75dp"
+            android:layout_gravity="left"
+            android:layout_marginLeft="7dp"
+            android:layout_marginTop="-9dp"
+            android:src="@drawable/white_logo" />
+
+        <ImageView
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:layout_gravity="right"
+            android:layout_marginTop="7dp"
+            android:layout_marginRight="7dp"
+            android:src="@drawable/menu">
+
+        </ImageView>
+
+    </LinearLayout>
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cv"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_margin="8dp">
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/cardview_compat_inset_shadow"
+            android:layout_marginStart="@dimen/cardview_compat_inset_shadow"
+            android:layout_marginRight="@dimen/cardview_default_elevation"
+            android:layout_marginEnd="@dimen/cardview_default_elevation"
+            android:layout_marginBottom="@dimen/cardview_default_elevation"
+            android:layout_marginTop="@dimen/cardview_compat_inset_shadow">
 
-            <ImageView
-                android:id="@+id/pictureChat"
-                android:scaleType="fitXY"
-                android:layout_width="60dp"
-                android:layout_height="60dp"
-                android:layout_marginEnd="8dp"
-                android:layout_marginRight="8dp"/>
-                <!--android:src="@drawable/ic_test" /-->
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_margin="8dp">
+
+                <ImageView
+                    android:id="@+id/pictureChat"
+                    android:scaleType="fitXY"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    android:layout_marginEnd="8dp"
+                    android:layout_marginRight="8dp"/>
+                    <!--android:src="@drawable/ic_test" /-->
+
+                    <TextView
+                        android:id="@+id/name_chat"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_toRightOf="@id/pictureChat"
+                        android:layout_toEndOf="@id/pictureChat"
+                        android:paddingLeft="2sp"
+                        android:paddingRight="2sp"
+                        android:text="Ali Haider"
+                        android:textSize="16sp"
+                        android:textColor="@color/smokyBlack"
+                        android:textStyle="bold"
+                        />
 
                 <TextView
-                    android:id="@+id/name_chat"
+                    android:id="@+id/lastMessage"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_toRightOf="@id/pictureChat"
-                    android:layout_toEndOf="@id/pictureChat"
+                    android:gravity="left"
                     android:paddingLeft="2sp"
                     android:paddingRight="2sp"
-                    android:text="Ali Haider"
-                    android:textSize="16sp"
-                    android:textColor="@color/smokyBlack"
-                    android:textStyle="bold"
-                    />
+                    android:text="See you tomorrow!"
+                    android:singleLine="true"
+                    android:maxLines="1"
+                    android:ellipsize="end"
+                    android:layout_toRightOf="@id/pictureChat"
+                    android:layout_below="@id/name_chat" />
 
-            <TextView
-                android:id="@+id/lastMessage"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="left"
-                android:paddingLeft="2sp"
-                android:paddingRight="2sp"
-                android:text="See you tomorrow!"
-                android:singleLine="true"
-                android:maxLines="1"
-                android:ellipsize="end"
-                android:layout_toRightOf="@id/pictureChat"
-                android:layout_below="@id/name_chat" />
+            </RelativeLayout>
 
-        </RelativeLayout>
-
-    </androidx.cardview.widget.CardView>
+        </androidx.cardview.widget.CardView>
 
 </LinearLayout>
