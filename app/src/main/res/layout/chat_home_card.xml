@@ -6,7 +6,8 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <LinearLayout
+    <!--Remove this and put it in activity home-->
+    <!--<LinearLayout
         android:layout_width="match_parent"
         android:layout_height="65dp"
         android:orientation="horizontal"
@@ -31,7 +32,7 @@
 
         </ImageView>
 
-    </LinearLayout>
+    </LinearLayout>-->
 
         <androidx.cardview.widget.CardView
             android:id="@+id/cv"

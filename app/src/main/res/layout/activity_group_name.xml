@@ -86,13 +86,15 @@
         android:orientation="horizontal"
         android:paddingTop="25dp"
         android:paddingLeft="15dp"
-        android:paddingRight="15dp">
+        android:paddingRight="15dp"
+
+        android:descendantFocusability="blocksDescendants">
 
         <Button
             android:id="@+id/done_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="bottom|right"
+            android:layout_gravity="end|right"
             android:layout_margin="7dp"
             android:background="@drawable/rounded_rectangle_green"
             android:text="DONE"/>
