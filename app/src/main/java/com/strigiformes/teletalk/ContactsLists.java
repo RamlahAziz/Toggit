@@ -20,6 +20,7 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.strigiformes.teletalk.CustomObjects.User;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -115,5 +116,12 @@ public class ContactsLists extends Activity{
         });
         }
 
-    }
+    public void newChat(View view){
 
+        Intent groupIntent = new Intent(ContactsLists.this, SelectGroupContacts.class);
+        Bundle bundle = new Bundle();
+        bundle.putSerializable("CONTACTS", (Serializable) appContacts);
+        groupIntent.putExtras(bundle);
+        startActivity(groupIntent);
+    }
+    }

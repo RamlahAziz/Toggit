@@ -2,6 +2,7 @@ package com.strigiformes.teletalk;
 
 import android.content.Context;
 import android.util.Log;
+import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,9 +17,12 @@ public class CustomListAdapter extends ArrayAdapter<User> {
     private List<User> list;
     private TextView name;
 
+    private SparseBooleanArray mSelectedItemsIds;
+
     public CustomListAdapter(Context context, int resource, List<User> objects) {
         super(context, resource, objects);
         this.list = objects;
+        mSelectedItemsIds = new SparseBooleanArray();
     }
 
     @Override
@@ -34,6 +38,26 @@ public class CustomListAdapter extends ArrayAdapter<User> {
         name.setText(getItem(position).getName());
 
         return convertView;
+    }
+
+    public void toggleSelection(int position) {
+        selectView(position, !mSelectedItemsIds.get(position));
+    }
+
+    public void selectView(int position, boolean value) {
+        if (value)
+            mSelectedItemsIds.put(position, value);
+        else
+            mSelectedItemsIds.delete(position);
+        notifyDataSetChanged();
+    }
+
+    public int getSelectedCount() {
+        return mSelectedItemsIds.size();
+    }
+
+    public SparseBooleanArray getSelectedIds() {
+        return mSelectedItemsIds;
     }
 
 }

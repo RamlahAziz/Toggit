@@ -26,6 +26,35 @@
 
         </TextView>
     </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:descendantFocusability="blocksDescendants">
+        <ImageView
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:src='@drawable/userpic'
+            android:onClick="newChat"
+            android:clickable="true"/>
+
+        <TextView
+            android:id="@+id/create_group"
+            android:padding="16dp"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:text="New Group"
+            android:focusableInTouchMode="false"
+            android:textStyle="bold"
+            android:onClick="newChat"
+            android:clickable="true"/>
+
+
+    </LinearLayout>
+
+
     <ListView
         android:id="@+id/contacts_list"
         android:layout_width="match_parent"
