@@ -56,15 +56,16 @@ public class AddGroupName extends Activity {
         list.setAdapter(listviewadapter);
 
         mGroupName = findViewById(R.id.group_name_field);
-        groupName = mGroupName.getText().toString();
+
 
         doneButton = (Button) findViewById(R.id.done_button);
         doneButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                groupName = mGroupName.getText().toString();
+                if(groupName != null && !groupName.isEmpty()){
 
-                if(groupName.length()>0){
-
+                    Log.d(TAG,"groupname LENGTH IS greater than 0 MARIA");
                     //Create Chatroom
                     db.collection("ChatRooms").document(groupName)
                             .set(groupList)
