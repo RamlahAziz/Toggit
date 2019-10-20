@@ -28,7 +28,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SelectGroupContacts extends Activity {
+public class SelectGroupContacts extends AppCompatActivity {
 
     ListView list;
     CustomListAdapter listviewadapter;
@@ -43,6 +43,10 @@ public class SelectGroupContacts extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_select_group_contacts);
+
+        assert getSupportActionBar() != null;   //null check
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);   //show back button
+        setTitle("Select Group Members");
 
         appContacts = (List<User>) getIntent().getExtras().getSerializable("CONTACTS");
         Log.d("groupContacts", appContacts.toString());
@@ -128,4 +132,12 @@ public class SelectGroupContacts extends Activity {
             }
     });
     }
+
+    //on clicking back button finish activity and go back
+    @Override
+    public boolean onSupportNavigateUp(){
+        finish();
+        return true;
+    }
 }
+

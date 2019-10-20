@@ -12,6 +12,7 @@ import android.widget.ListView;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -25,7 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class ContactsLists extends Activity{
+public class ContactsLists extends AppCompatActivity{
 
     private static final String TAG = "tag";
 
@@ -41,6 +42,10 @@ public class ContactsLists extends Activity{
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_contacts_lists);
+
+        assert getSupportActionBar() != null;   //null check
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);   //show back button
+        setTitle("Select Contact");
 
         mListView = findViewById(R.id.contacts_list);
 
@@ -62,6 +67,13 @@ public class ContactsLists extends Activity{
         });
 
         mAdapter.notifyDataSetChanged();
+    }
+
+    //on clicking back button finish activity and go back
+    @Override
+    public boolean onSupportNavigateUp(){
+        finish();
+        return true;
     }
 
     private void readContacts() {

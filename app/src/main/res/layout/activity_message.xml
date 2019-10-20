@@ -59,10 +59,11 @@
 
         <ImageButton
             android:id="@+id/attach_button"
-            android:layout_width="wrap_content"
+            android:layout_width="52dp"
             android:layout_height="48dp"
             android:padding="10dp"
-            app:srcCompat="@drawable/ic_test"/>
+            android:scaleType="fitCenter"
+            app:srcCompat="@drawable/attachment" />
 
         <EditText
             android:id="@+id/edittext_chatbox"
