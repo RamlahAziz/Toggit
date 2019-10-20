@@ -17,6 +17,7 @@ import android.widget.ListView;
 
 import com.strigiformes.teletalk.CustomObjects.User;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -69,6 +70,13 @@ public class SelectGroupContacts extends Activity {
                                 group.add(selecteditem);
                             }
                         }
+
+                        Intent groupNameIntent = new Intent(SelectGroupContacts.this, AddGroupName.class);
+                        Bundle bundle = new Bundle();
+                        bundle.putSerializable("GROUP_MEMBERS", (Serializable) group);
+                        groupNameIntent.putExtras(bundle);
+                        startActivity(groupNameIntent);
+
                         // Close CAB
                         mode.finish();
                         return true;

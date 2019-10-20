@@ -22,6 +22,7 @@
             </intent-filter>
         </service>
 
+        <activity android:name=".AddGroupName" />
         <activity android:name=".MessageActivity" />
         <activity android:name=".UserRegistration" />
         <activity
