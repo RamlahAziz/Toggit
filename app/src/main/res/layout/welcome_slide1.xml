@@ -20,7 +20,7 @@
         android:layout_height="wrap_content"
         android:fontFamily="@font/toy"
         android:text="@string/slide_1_title"
-        android:textColor="@color/colorPrimaryDark"
+        android:textColor="@color/colorPrimary"
         android:textSize="@dimen/slide_title"
         android:textStyle="bold" />
 
