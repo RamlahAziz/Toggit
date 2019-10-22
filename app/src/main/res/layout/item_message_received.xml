@@ -36,6 +36,7 @@
             android:layout_height="wrap_content"
             android:maxWidth="240dp"
             android:padding="8dp"
+            android:textSize="20sp"
             android:textColor="@color/smokyBlack"
             android:layout_marginTop="4dp"
             app:layout_constraintTop_toTopOf="parent"
@@ -47,7 +48,7 @@
             android:text="11:40"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="10sp"
+            android:textSize="12sp"
             app:layout_constraintLeft_toRightOf="@+id/text_message_body"
             android:layout_marginLeft="4dp"
             app:layout_constraintBottom_toBottomOf="@+id/text_message_body" />

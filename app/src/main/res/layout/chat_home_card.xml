@@ -67,6 +67,7 @@
                         android:layout_toEndOf="@id/pictureChat"
                         android:paddingLeft="2sp"
                         android:paddingRight="2sp"
+                        android:paddingTop="8sp"
                         android:text="Ali Haider"
                         android:textSize="16sp"
                         android:textColor="@color/smokyBlack"
