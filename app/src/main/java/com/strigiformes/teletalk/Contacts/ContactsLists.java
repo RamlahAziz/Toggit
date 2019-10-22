@@ -1,6 +1,5 @@
-package com.strigiformes.teletalk;
+package com.strigiformes.teletalk.Contacts;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.database.Cursor;
 import android.provider.ContactsContract;
@@ -19,7 +18,11 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.strigiformes.teletalk.CustomObjects.ChatListItem;
 import com.strigiformes.teletalk.CustomObjects.User;
+import com.strigiformes.teletalk.GroupCreation.SelectGroupContacts;
+import com.strigiformes.teletalk.MessageActivity;
+import com.strigiformes.teletalk.R;
 
 import java.io.Serializable;
 import java.util.ArrayList;
