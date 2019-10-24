@@ -1,4 +1,4 @@
-package com.strigiformes.teletalk;
+package com.strigiformes.teletalk.ConversationThreads;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -32,6 +32,11 @@ import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.strigiformes.teletalk.CustomObjects.ChatListItem;
+import com.strigiformes.teletalk.Contacts.ContactsLists;
+import com.strigiformes.teletalk.MessageActivity;
+import com.strigiformes.teletalk.R;
+import com.strigiformes.teletalk.StartUp.MainActivity;
 
 //Home screen of our app
 //This displays a list of current chats user has
@@ -189,6 +194,7 @@ public class HomeActivity extends AppCompatActivity {
                 }
 
                 for (DocumentChange dc : queryDocumentSnapshots.getDocumentChanges()) {
+
                     switch (dc.getType()) {
                         case ADDED:
 
@@ -210,10 +216,47 @@ public class HomeActivity extends AppCompatActivity {
                             mAdapter.notifyDataSetChanged();
                             break;
                         case MODIFIED:
-                            Log.d(TAG, "Modified city: " + dc.getDocument().getData());
+                            Log.d(TAG, "Modified chat: " + dc.getDocument().getData());
                             break;
                         case REMOVED:
-                            Log.d(TAG, "Removed city: " + dc.getDocument().getData());
+                            Log.d(TAG, "Removed chat: " + dc.getDocument().getData());
+                            break;
+                    }
+                }
+            }
+        });
+
+        Query groupQuery = db.collection("users").document(user.getPhoneNumber())
+                .collection("ChatRooms");
+        listenerRegistration = groupQuery.addSnapshotListener(new EventListener<QuerySnapshot>() {
+            @Override
+            public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
+                if (e != null) {
+                    Log.w(TAG, "listen:error", e);
+                    return;
+                }
+
+                for (DocumentChange dc : queryDocumentSnapshots.getDocumentChanges()) {
+
+                    switch (dc.getType()) {
+                        case ADDED:
+
+                            Map<String, Object> doc =dc.getDocument().getData();
+                            Log.d(TAG, "New chat: " + doc);
+                            ChatListItem chatListItem = new ChatListItem();
+                            chatListItem.setToPhone(Objects.requireNonNull(doc.get("idReceiver")).toString());
+                            chatListItem.setFromPhone(Objects.requireNonNull(doc.get("idSender")).toString());
+                            chatListItem.setChatId(dc.getDocument().getId());
+                            chatListItem.setMsgPreview(Objects.requireNonNull(doc.get("textMessage")).toString());
+                            chatListItem.setName(dc.getDocument().getId());
+                            chatsList.add(chatListItem);
+                            mAdapter.notifyDataSetChanged();
+                            break;
+                        case MODIFIED:
+                            Log.d(TAG, "Modified chat: " + dc.getDocument().getData());
+                            break;
+                        case REMOVED:
+                            Log.d(TAG, "Removed chat: " + dc.getDocument().getData());
                             break;
                     }
                 }

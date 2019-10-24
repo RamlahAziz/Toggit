@@ -41,6 +41,7 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.strigiformes.teletalk.CustomObjects.ChatListItem;
 import com.strigiformes.teletalk.CustomObjects.Message;
 import com.strigiformes.teletalk.CustomObjects.User;
 
@@ -227,12 +228,17 @@ public class MessageActivity extends AppCompatActivity  {
                                                     Log.d("Driver Upload", "onSuccess: uri= "+ uri.toString());
 
                                                     Message message = new Message();
-                                                    message.setTextMessage(uri.toString());
+                                                    message.setFileLoction(uri.toString());
+                                                    /*
+                                                    * TODO RAMLAH this text message needs to be a clickable
+                                                    *  widget that opens the file in the required reader
+                                                    * instead of a textview
+                                                    * */
+
+                                                    message.setTextMessage(mFileName);
                                                     message.setFile(true);
 
                                                     makeMessage(message);
-                                                    /*DatabaseReference mRef = FirebaseDatabase.getInstance().getReference().child("Customer");
-                                                    mRef.child(phone_Number).child("idImage").setValue(uri.toString());*/
 
                                                 }
                                             });
@@ -406,10 +412,14 @@ public class MessageActivity extends AppCompatActivity  {
                     Log.d(TAG, "New message: " + dc.getDocument().getData());
                     Map<String, Object> doc =dc.getDocument().getData();
                     Message message = new Message();
-                    message.setSenderName(doc.get("senderName").toString());
-                    message.setTextMessage(doc.get("textMessage").toString());
-                    message.setIdSender(doc.get("idSender").toString());
+                    message.setSenderName(Objects.requireNonNull(doc.get("senderName")).toString());
+                    message.setIdSender(Objects.requireNonNull(doc.get("idSender")).toString());
                     message.setTimestamp((Long) doc.get("timestamp"));
+                    if ((Boolean) Objects.requireNonNull(doc.get("file"))) {
+
+                    } else {
+                        message.setTextMessage(Objects.requireNonNull(doc.get("textMessage")).toString());
+                    }
                     messageList.add(message);
                     mMessageAdapter.notifyDataSetChanged();
                     break;
@@ -496,10 +506,10 @@ public class MessageActivity extends AppCompatActivity  {
                                                 .getData()).get("name")).toString());
 
                                         /*
-                                         * the id generated from add does not automatically
+                                         * the id generated from ".add()" does not automatically
                                          * have a timestamp as in push() from realtime database
                                          */
-
+                                        //add message to chatroom
                                         message.setThreadId(groupName);
                                         db.collection("ChatRooms").document(groupName)
                                                 .collection("messages")

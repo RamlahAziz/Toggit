@@ -11,8 +11,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".SelectGroupContacts"></activity>
-        <activity android:name=".ContactsLists" />
+        <activity android:name=".GroupCreation.SelectGroupContacts"></activity>
+        <activity android:name=".Contacts.ContactsLists" />
 
         <service
             android:name=".Service.MyFirebaseMessagingService"
@@ -22,16 +22,16 @@
             </intent-filter>
         </service>
 
-        <activity android:name=".AddGroupName" />
+        <activity android:name=".GroupCreation.AddGroupName" />
         <activity android:name=".MessageActivity" />
-        <activity android:name=".UserRegistration" />
+        <activity android:name=".StartUp.UserRegistration" />
         <activity
-            android:name=".HomeActivity"
+            android:name=".ConversationThreads.HomeActivity"
             android:theme="@style/AppTheme.NoActionBar"></activity>
-        <activity android:name=".WelcomeActivity" />
-        <activity android:name=".MainActivity" />
+        <activity android:name=".StartUp.WelcomeActivity" />
+        <activity android:name=".StartUp.MainActivity" />
         <activity
-            android:name=".SplashActivity"
+            android:name=".StartUp.SplashActivity"
             android:screenOrientation="portrait"
             android:theme="@style/SplashTheme">
             <intent-filter>

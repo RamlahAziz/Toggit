@@ -1,4 +1,4 @@
-package com.strigiformes.teletalk;
+package com.strigiformes.teletalk.StartUp;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -15,6 +15,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.strigiformes.teletalk.ConversationThreads.HomeActivity;
 
 import java.util.Arrays;
 

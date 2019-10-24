@@ -1,4 +1,4 @@
-package com.strigiformes.teletalk;
+package com.strigiformes.teletalk.CustomObjects;
 
 import java.io.Serializable;
 
@@ -11,6 +11,7 @@ public class ChatListItem implements Serializable {
     private String chatId;
     private String fromPhone;
     private String toPhone;
+    private String groupName;
 
     public ChatListItem() {
     }
@@ -18,19 +19,6 @@ public class ChatListItem implements Serializable {
     public ChatListItem(String name, String toPhone) {
         this.name = name;
         this.toPhone = toPhone;
-    }
-
-    @Override
-    public String toString() {
-        return "ChatListItem{" +
-                "name='" + name + '\'' +
-                ", timeStamp='" + timeStamp + '\'' +
-                ", msgPreview='" + msgPreview + '\'' +
-                ", pictureUri='" + pictureUri + '\'' +
-                ", chatId='" + chatId + '\'' +
-                ", fromPhone='" + fromPhone + '\'' +
-                ", toPhone='" + toPhone + '\'' +
-                '}';
     }
 
     public String getToPhone() {
@@ -87,5 +75,27 @@ public class ChatListItem implements Serializable {
 
     public void setMsgPreview(String msgPreview) {
         this.msgPreview = msgPreview;
+    }
+
+    public String getGroupName() {
+        return groupName;
+    }
+
+    public void setGroupName(String groupName) {
+        this.groupName = groupName;
+    }
+
+    @Override
+    public String toString() {
+        return "ChatListItem{" +
+                "name='" + name + '\'' +
+                ", timeStamp='" + timeStamp + '\'' +
+                ", msgPreview='" + msgPreview + '\'' +
+                ", pictureUri='" + pictureUri + '\'' +
+                ", chatId='" + chatId + '\'' +
+                ", fromPhone='" + fromPhone + '\'' +
+                ", toPhone='" + toPhone + '\'' +
+                ", groupName='" + groupName + '\'' +
+                '}';
     }
 }

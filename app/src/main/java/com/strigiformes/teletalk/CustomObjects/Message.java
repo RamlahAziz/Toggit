@@ -17,6 +17,7 @@ public class Message {
     private String senderName;
     private String receiverName;
     private Boolean isFile = false;
+    private String fileLoction;
 
     public Message() {
     }
@@ -101,6 +102,14 @@ public class Message {
         isFile = file;
     }
 
+    public String getFileLoction() {
+        return fileLoction;
+    }
+
+    public void setFileLoction(String fileLoction) {
+        this.fileLoction = fileLoction;
+    }
+
     @Override
     public String toString() {
         return "Message{" +
@@ -114,6 +123,7 @@ public class Message {
                 ", senderName='" + senderName + '\'' +
                 ", receiverName='" + receiverName + '\'' +
                 ", isFile=" + isFile +
+                ", fileLoction='" + fileLoction + '\'' +
                 '}';
     }
 }

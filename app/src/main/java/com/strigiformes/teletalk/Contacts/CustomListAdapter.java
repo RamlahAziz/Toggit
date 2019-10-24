@@ -1,4 +1,4 @@
-package com.strigiformes.teletalk;
+package com.strigiformes.teletalk.Contacts;
 
 import android.content.Context;
 import android.util.Log;
@@ -10,6 +10,8 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
 import com.strigiformes.teletalk.CustomObjects.User;
+import com.strigiformes.teletalk.R;
+
 import java.util.List;
 
 public class CustomListAdapter extends ArrayAdapter<User> {
