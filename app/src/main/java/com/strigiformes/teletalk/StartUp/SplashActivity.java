@@ -1,4 +1,4 @@
-package com.strigiformes.teletalk;
+package com.strigiformes.teletalk.StartUp;
 
 import android.content.Intent;
 import android.os.Bundle;

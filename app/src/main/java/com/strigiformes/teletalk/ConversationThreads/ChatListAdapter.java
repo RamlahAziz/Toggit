@@ -1,7 +1,6 @@
-package com.strigiformes.teletalk;
+package com.strigiformes.teletalk.ConversationThreads;
 
 import android.content.Context;
-import android.net.Uri;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,8 +9,8 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.RequestOptions;
+import com.strigiformes.teletalk.CustomObjects.ChatListItem;
+import com.strigiformes.teletalk.R;
 
 import java.util.List;
 
