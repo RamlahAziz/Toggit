@@ -59,6 +59,7 @@ public class SelectGroupContacts extends AppCompatActivity {
                 if (task.isSuccessful()) {
                     DocumentSnapshot senderDoc = task.getResult();
                     me.setName(senderDoc.getData().get("name").toString());
+                    me.setDeviceToken(senderDoc.getData().get("tokenId").toString());
                     group.add(me);
                 }
             }
@@ -91,6 +92,7 @@ public class SelectGroupContacts extends AppCompatActivity {
                         SparseBooleanArray selected = listviewadapter
                                 .getSelectedIds();
                         // Captures all selected ids with a loop
+                        group.clear();
                         for (int i = (selected.size() - 1); i >= 0; i--) {
                             if (selected.valueAt(i)) {
                                 User selecteditem = listviewadapter

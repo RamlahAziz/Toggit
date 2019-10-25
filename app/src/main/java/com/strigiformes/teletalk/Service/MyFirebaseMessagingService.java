@@ -36,7 +36,6 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
     private void generateNotification(String title, String body, String click_action) {
 
-        //Intent intent = new Intent(this, MainActivity.class);
         Intent intent;
         if(click_action.equals("WELCOME")){
             intent = new Intent(this, WelcomeActivity.class);
@@ -44,7 +43,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         }
         else{
             intent = new Intent(this, HomeActivity.class);
-            intent.putExtra("OPEN_TAB", "posted");
+            //intent.putExtra("OPEN_TAB", "posted");
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         }
 

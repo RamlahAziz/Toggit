@@ -16,8 +16,10 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -34,6 +36,8 @@ import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.strigiformes.teletalk.CustomObjects.ChatListItem;
 import com.strigiformes.teletalk.Contacts.ContactsLists;
+import com.strigiformes.teletalk.CustomObjects.Message;
+import com.strigiformes.teletalk.CustomObjects.User;
 import com.strigiformes.teletalk.MessageActivity;
 import com.strigiformes.teletalk.R;
 import com.strigiformes.teletalk.StartUp.MainActivity;
@@ -83,8 +87,13 @@ public class HomeActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
 
                 Intent chatIntent = new Intent(HomeActivity.this, MessageActivity.class);
-                chatIntent.putExtra("CHAT", chatsList.get(i));
-                Log.d("testing5 MainChat",  chatsList.get(i).toString());
+                Bundle bundle = new Bundle();
+                bundle.putSerializable("CHAT", chatsList.get(i));
+                if (chatsList.get(i).getToPhone()==null) {
+                    bundle.putSerializable("GROUP_CHAT", true);
+                    bundle.putSerializable("GROUP_NAME", chatsList.get(i).getName());
+                }
+                chatIntent.putExtras(bundle);
                 startActivity(chatIntent);
             }
         });
@@ -199,7 +208,7 @@ public class HomeActivity extends AppCompatActivity {
                         case ADDED:
 
                             Map<String, Object> doc =dc.getDocument().getData();
-                            Log.d(TAG, "New chat: " + doc);
+                            Log.d(TAG, "New individual chat: " + doc);
                             ChatListItem chatListItem = new ChatListItem();
                             chatListItem.setToPhone(Objects.requireNonNull(doc.get("idReceiver")).toString());
                             chatListItem.setFromPhone(Objects.requireNonNull(doc.get("idSender")).toString());
@@ -240,15 +249,22 @@ public class HomeActivity extends AppCompatActivity {
 
                     switch (dc.getType()) {
                         case ADDED:
-
-                            Map<String, Object> doc =dc.getDocument().getData();
-                            Log.d(TAG, "New chat: " + doc);
                             ChatListItem chatListItem = new ChatListItem();
-                            chatListItem.setToPhone(Objects.requireNonNull(doc.get("idReceiver")).toString());
-                            chatListItem.setFromPhone(Objects.requireNonNull(doc.get("idSender")).toString());
                             chatListItem.setChatId(dc.getDocument().getId());
-                            chatListItem.setMsgPreview(Objects.requireNonNull(doc.get("textMessage")).toString());
                             chatListItem.setName(dc.getDocument().getId());
+                            Map<String, Object> doc =dc.getDocument().getData();
+                            Log.d(TAG, "New group chat: " + doc);
+                            if (doc.get("lastMessage") != null) {
+                                final ObjectMapper mapper = new ObjectMapper();
+                                final Message message = mapper.convertValue(doc.get("lastMessage"), Message.class);
+                                Log.d("inside if", chatListItem.getChatId());
+                                //chatListItem.setToPhone(Objects.requireNonNull(message.getIdReceiver()));
+                                chatListItem.setFromPhone(Objects.requireNonNull(message.getIdSender()));
+                                chatListItem.setMsgPreview(Objects.requireNonNull(message.getTextMessage()));
+                            } else {
+                                chatListItem.setMsgPreview("");
+                            }
+                            Log.d("Adding chat in list", chatListItem.toString());
                             chatsList.add(chatListItem);
                             mAdapter.notifyDataSetChanged();
                             break;
@@ -262,168 +278,6 @@ public class HomeActivity extends AppCompatActivity {
                 }
             }
         });
-
-        /*db.collection("users").document(user.getPhoneNumber())
-                .collection("userchats").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-
-                for(DocumentSnapshot doc: Objects.requireNonNull(task.getResult())){
-                    ChatListItem chatListItem = new ChatListItem();
-                    chatListItem.setToPhone(Objects.requireNonNull(doc.getData().get("idReceiver")).toString());
-                    chatListItem.setFromPhone(Objects.requireNonNull(doc.getData().get("idSender")).toString());
-                    chatListItem.setChatId(doc.getId());
-                    chatListItem.setMsgPreview(Objects.requireNonNull(doc.getData().get("textMessage")).toString());
-
-                    if(user.getPhoneNumber().equals(chatListItem.getFromPhone())){
-                        chatListItem.setName(Objects.requireNonNull(doc.getData().get("receiverName")).toString());
-                    } else{
-                        chatListItem.setName(Objects.requireNonNull(doc.getData().get("senderName")).toString());
-                    }
-
-                    chatsList.add(chatListItem);
-                    mAdapter.notifyDataSetChanged();
-
-                }
-                for(QueryDocumentSnapshot document : task.getResult()){
-                    databaseChatsList.add(document.getId());
-                }
-
-                Log.d("databasechats", databaseChatsList.toString());
-
-                List<String> phoneNumbers = new ArrayList<>();
-                for(String chat: databaseChatsList){
-                    String number = chat.replace(user.getPhoneNumber(), "");
-                    phoneNumbers.add(number);
-                }
-
-                for(String number: phoneNumbers){
-                    db.collection("users")
-                            .document(number).get()
-                            .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                                @Override
-                                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                                    DocumentSnapshot doc = task.getResult();
-
-                                    if(doc!=null){
-                                        final ChatListItem chatListItem = new ChatListItem();
-                                        chatListItem.setName(Objects.requireNonNull
-                                                (Objects.requireNonNull(doc.getData()).get("name")).toString());
-                                        chatListItem.setToPhone(doc.getId());
-                                        chatListItem.setFromPhone(user.getPhoneNumber());
-
-                                        String chatId = chatId(chatListItem.getFromPhone(), chatListItem.getToPhone());
-                                        chatListItem.setChatId(chatId);
-
-                                        //store msgs using timestamp to retrieve ordered msgs
-                                        db.collection("chats").document(chatId)
-                                                .collection("messages").orderBy("timestamp", Query.Direction.DESCENDING)
-                                                .limit(1).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                                            @Override
-                                            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-
-                                                for(DocumentSnapshot documentSnapshot: Objects.requireNonNull(task.getResult()))
-                                                {
-                                                    if (documentSnapshot!=null) {
-                                                        chatListItem.setMsgPreview(Objects.requireNonNull(Objects
-                                                                .requireNonNull(documentSnapshot.getData())
-                                                                .get("textMessage")).toString());
-
-                                                        chatsList.add(chatListItem);
-                                                        mAdapter.notifyDataSetChanged();
-
-                                                    }
-                                                }
-                                            }
-                                        });
-
-                                    }
-                                }
-                            });
-                }
-
-            }
-        });*/
-        /*db.collection("users")
-                .document(Objects.requireNonNull(user.getPhoneNumber()))
-                .get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                        DocumentSnapshot document = task.getResult();
-                        List<String> databaseChatsList = (List<String>) document.get("chats");
-
-                        Log.d("databasechats", databaseChatsList.toString());
-
-                        List<String> phoneNumbers = new ArrayList<>();
-                        for(String chat: databaseChatsList){
-                            String number = chat.replace(user.getPhoneNumber(), "");
-                            phoneNumbers.add(number);
-                        }
-
-                        for(String number: phoneNumbers){
-                            db.collection("users")
-                                    .document(number).get()
-                                    .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                                @Override
-                                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                                    DocumentSnapshot doc = task.getResult();
-
-                                    if(doc!=null){
-                                        final ChatListItem chatListItem = new ChatListItem();
-                                        chatListItem.setName(Objects.requireNonNull
-                                                (Objects.requireNonNull(doc.getData()).get("name")).toString());
-                                        chatListItem.setToPhone(doc.getId());
-                                        chatListItem.setFromPhone(user.getPhoneNumber());
-
-                                        String chatId = chatId(chatListItem.getFromPhone(), chatListItem.getToPhone());
-                                        chatListItem.setChatId(chatId);
-
-                                        //store msgs using timestamp to retrieve ordered msgs
-                                        db.collection("chats").document(chatId)
-                                                .collection("messages").orderBy("timestamp", Query.Direction.DESCENDING)
-                                                .limit(1).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                                            @Override
-                                            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-
-                                                for(DocumentSnapshot documentSnapshot: Objects.requireNonNull(task.getResult()))
-                                                {
-                                                    if (documentSnapshot!=null) {
-                                                        chatListItem.setMsgPreview(Objects.requireNonNull(Objects
-                                                                .requireNonNull(documentSnapshot.getData())
-                                                                .get("textMessage")).toString());
-
-                                                        chatsList.add(chatListItem);
-                                                        mAdapter.notifyDataSetChanged();
-
-                                                    }
-                                                }
-                                            }
-                                        });
-
-                                    }
-                                }
-                            });
-                        }
-                    }
-                });*/
-    }
-
-    public String chatId(String sender, String receiver) {
-
-        String chatId;
-
-        /*
-         * The result is positive
-         * if the first string is lexicographically greater than the second string
-         * else the result would be negative
-         * */
-        if(sender.compareTo(receiver) > 0 ){
-            chatId = sender+receiver;
-        }else {
-            chatId = receiver+sender;
-        }
-
-        return chatId;
     }
 
     private void signOut(){

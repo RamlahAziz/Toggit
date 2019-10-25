@@ -22,6 +22,7 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -45,7 +46,10 @@ import com.strigiformes.teletalk.CustomObjects.ChatListItem;
 import com.strigiformes.teletalk.CustomObjects.Message;
 import com.strigiformes.teletalk.CustomObjects.User;
 
+import org.w3c.dom.Document;
+
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -77,7 +81,7 @@ public class MessageActivity extends AppCompatActivity  {
 
     private ListenerRegistration listenerRegistration;
     //For Group chat rooms
-    List<User> groupList = new ArrayList<User>();
+    List<User> groupList;
     private String groupName;
     Boolean groupChat = false;
 
@@ -88,11 +92,44 @@ public class MessageActivity extends AppCompatActivity  {
 
         Intent i = getIntent();
         chat = (ChatListItem) i.getSerializableExtra("CHAT");
-        groupList = (List<User>) getIntent().getExtras().getSerializable("CONTACTS");
-        groupName = (String) getIntent().getExtras().getSerializable("GROUP_NAME");
+
         if(getIntent().getExtras().getSerializable("GROUP_CHAT") != null){
             groupChat = (Boolean) getIntent().getExtras().getSerializable("GROUP_CHAT");
+            groupName = (String) getIntent().getExtras().getSerializable("GROUP_NAME");
+            //if group chat is opened from create group
+            groupList = (List<User>) getIntent().getExtras().getSerializable("CONTACTS");
+            //if group chat is opened form home page
+            if(groupList == null){
+                groupList = new ArrayList<User>();
+                db.collection("ChatRooms").document(groupName).get()
+                        .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                            @Override
+                            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                if (task.isSuccessful()) {
+
+                                    DocumentSnapshot document = task.getResult();
+                                    Map<String, Object> map = document.getData();
+
+                                    for (Map.Entry<String, Object> entry : map.entrySet()) {
+
+                                        ArrayList<Map<String, Object>> arrayList = (ArrayList<Map<String, Object>>) entry.getValue();
+
+                                        for (Map<String, Object> userEntry : arrayList) {
+                                            final ObjectMapper mapper = new ObjectMapper(); // jackson's objectmapper
+                                            final User groupMember = mapper.convertValue(userEntry, User.class);
+                                            groupList.add(groupMember);
+                                        }
+                                    }
+                                    Log.d(TAG, "groupList final: "+groupList);
+                                }
+                            }
+                        });
+            }
         }
+
+
+
+
 
         assert getSupportActionBar() != null;   //null check
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);   //show back button
@@ -447,29 +484,6 @@ public class MessageActivity extends AppCompatActivity  {
                 assert queryDocumentSnapshots != null;
                 retrieveMessages(queryDocumentSnapshots);
         }
-        /*.get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-
-                        messageList.clear();
-
-                        if (task.isSuccessful()) {
-                            for (QueryDocumentSnapshot document : task.getResult()) {
-
-                                Map<String, Object> doc =document.getData();
-
-                                Message message = new Message();
-                                message.setSenderName(doc.get("senderName").toString());
-                                message.setTextMessage(doc.get("textMessage").toString());
-                                message.setIdSender(doc.get("idSender").toString());
-                                message.setTimestamp((Long) doc.get("timestamp"));
-
-                                messageList.add(message);
-                            }
-                        }
-                    }
-                });*/
             });
     }
 
@@ -517,14 +531,14 @@ public class MessageActivity extends AppCompatActivity  {
 
                                         //add to last message received of every member
                                         for(User member:groupList){
-                                            message.setIdReceiver(member.getPhoneNumber());
+                                            //message.setIdReceiver(member.getPhoneNumber());
                                             message.setReceiverName(member.getName());
                                             message.setTokenReceiver(member.getDeviceToken());
 
                                             Map<String, Object> data = new HashMap<>();
                                             data.put("lastMessage", message);
 
-                                            db.collection("users").document(user.getPhoneNumber())
+                                            db.collection("users").document(member.getPhoneNumber())
                                                     .collection("ChatRooms").document(groupName)
                                                     .set(data, SetOptions.merge());
                                         }
