@@ -94,10 +94,13 @@ public class MessageActivity extends AppCompatActivity  {
         chat = (ChatListItem) i.getSerializableExtra("CHAT");
 
         if(getIntent().getExtras().getSerializable("GROUP_CHAT") != null){
+
             groupChat = (Boolean) getIntent().getExtras().getSerializable("GROUP_CHAT");
             groupName = (String) getIntent().getExtras().getSerializable("GROUP_NAME");
+
             //if group chat is opened from create group
             groupList = (List<User>) getIntent().getExtras().getSerializable("CONTACTS");
+
             //if group chat is opened form home page
             if(groupList == null){
                 groupList = new ArrayList<User>();
@@ -115,7 +118,7 @@ public class MessageActivity extends AppCompatActivity  {
                                         ArrayList<Map<String, Object>> arrayList = (ArrayList<Map<String, Object>>) entry.getValue();
 
                                         for (Map<String, Object> userEntry : arrayList) {
-                                            final ObjectMapper mapper = new ObjectMapper(); // jackson's objectmapper
+                                            final ObjectMapper mapper = new ObjectMapper();
                                             final User groupMember = mapper.convertValue(userEntry, User.class);
                                             groupList.add(groupMember);
                                         }
@@ -127,10 +130,6 @@ public class MessageActivity extends AppCompatActivity  {
             }
         }
 
-
-
-
-
         assert getSupportActionBar() != null;   //null check
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);   //show back button
 
@@ -140,7 +139,6 @@ public class MessageActivity extends AppCompatActivity  {
         } else{
             setTitle(chat.getName());
         }
-
 
         user = mauth.getCurrentUser();
 
