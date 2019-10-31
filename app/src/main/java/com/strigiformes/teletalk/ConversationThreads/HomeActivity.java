@@ -16,14 +16,11 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
@@ -88,7 +85,6 @@ public class HomeActivity extends AppCompatActivity {
         mNoChatsLayout = findViewById(R.id.noChatsLayout);
         fab = findViewById(R.id.fab);
 
-        readContacts();
         showChats();
 
          mAdapter = new ChatListAdapter(HomeActivity.this, R.layout.activity_home, chatsList);
@@ -101,8 +97,7 @@ public class HomeActivity extends AppCompatActivity {
 
                 Intent chatIntent = new Intent(HomeActivity.this, MessageActivity.class);
                 Bundle bundle = new Bundle();
-                Log.d("new ChatsList", chatsList.toString());
-                Log.d("chatselected", chatsList.get(i).toString());
+                bundle.putBoolean("HOME", true);
                 bundle.putSerializable("CHAT", chatsList.get(i));
                 if (chatsList.get(i).getToPhone()==null) {
                     bundle.putSerializable("GROUP_CHAT", true);
@@ -166,6 +161,8 @@ public class HomeActivity extends AppCompatActivity {
                 startActivity(contactsIntent);
             }
         });
+
+        //readContacts();
     }
 
     /*
@@ -251,6 +248,12 @@ public class HomeActivity extends AppCompatActivity {
                             chatListItem.setFromPhone(Objects.requireNonNull(doc.get("idSender")).toString());
                             chatListItem.setChatId(dc.getDocument().getId());
                             chatListItem.setMsgPreview(Objects.requireNonNull(doc.get("textMessage")).toString());
+                            chatListItem.setTimeStamp(Objects.requireNonNull(doc.get("timestamp")).toString());
+                            if(doc.get("lastSeen") != null){
+                                chatListItem.setLastSeen(doc.get("lastSeen").toString());
+                            } else {
+                                chatListItem.setLastSeen("0000000000000");
+                            }
 
                             if(user.getPhoneNumber().equals(chatListItem.getFromPhone())){
                                 chatListItem.setName(Objects.requireNonNull(doc.get("receiverName")).toString());
@@ -299,8 +302,15 @@ public class HomeActivity extends AppCompatActivity {
                                 //chatListItem.setToPhone(Objects.requireNonNull(message.getIdReceiver()));
                                 chatListItem.setFromPhone(Objects.requireNonNull(message.getIdSender()));
                                 chatListItem.setMsgPreview(Objects.requireNonNull(message.getTextMessage()));
+                                chatListItem.setTimeStamp(String.valueOf(message.getTimestamp()));
                             } else {
                                 chatListItem.setMsgPreview("");
+                                chatListItem.setTimeStamp("0000000000000");
+                            }
+                            if(doc.get("lastSeen") != null){
+                                chatListItem.setLastSeen(doc.get("lastSeen").toString());
+                            } else {
+                                chatListItem.setLastSeen("0000000000000");
                             }
                             Log.d("Adding chat in list", chatListItem.toString());
                             chatsList.add(chatListItem);
@@ -399,6 +409,7 @@ public class HomeActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        readContacts();
     }
 
     @Override

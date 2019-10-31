@@ -47,10 +47,7 @@ import com.strigiformes.teletalk.CustomObjects.ChatListItem;
 import com.strigiformes.teletalk.CustomObjects.Message;
 import com.strigiformes.teletalk.CustomObjects.User;
 
-import org.w3c.dom.Document;
-
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -60,6 +57,13 @@ import java.util.UUID;
 public class MessageActivity extends AppCompatActivity  {
 
     //private static final int ACTIVITY_NUM = 1;
+    private String TAG = "MessageListActivity";
+    private static final int GET_FROM_PHONE = 1;
+
+    private FirebaseAuth mauth = FirebaseAuth.getInstance();
+    private FirebaseUser user = mauth.getCurrentUser();
+    private final FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private ListenerRegistration listenerRegistration;
 
     private RecyclerView mMessageRecycler;
     private MessageListAdapter mMessageAdapter;
@@ -69,22 +73,15 @@ public class MessageActivity extends AppCompatActivity  {
     private View mNoMessageLayout;
 
     private List<Message> messageList = new ArrayList<>();
-
     private ChatListItem chat;
-    private String TAG = "MessageListActivity";
-
-    private FirebaseAuth mauth = FirebaseAuth.getInstance();
-    private FirebaseUser user = mauth.getCurrentUser();
-    private final FirebaseFirestore db = FirebaseFirestore.getInstance();
-
-    private static final int GET_FROM_PHONE = 1;
     private String mFileName;
+    private String receiver;
 
-    private ListenerRegistration listenerRegistration;
     //For Group chat rooms
     List<User> groupList;
     private String groupName;
     Boolean groupChat = false;
+    Boolean home= false;
 
     /**
      * Called when the activity has detected the user's press of the back
@@ -99,6 +96,22 @@ public class MessageActivity extends AppCompatActivity  {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
+
+        //update lastseen of the chat
+        Map<String, Object> data = new HashMap<>();
+        data.put("lastSeen", System.currentTimeMillis());
+
+        String type;
+        if(groupChat){
+            type = "ChatRooms";
+        } else {
+            type = "userchats";
+        }
+
+        db.collection("users").document(user.getPhoneNumber())
+                .collection(type).document(chat.getChatId())
+                .set(data, SetOptions.merge());
+
         startActivity(new Intent(MessageActivity.this, HomeActivity.class));
         finish();
     }
@@ -110,6 +123,7 @@ public class MessageActivity extends AppCompatActivity  {
 
         Intent i = getIntent();
         chat = (ChatListItem) i.getSerializableExtra("CHAT");
+        home = Objects.requireNonNull(getIntent().getExtras()).getBoolean("HOME");
 
         if(getIntent().getExtras().getSerializable("GROUP_CHAT") != null){
 
@@ -145,6 +159,20 @@ public class MessageActivity extends AppCompatActivity  {
                                 }
                             }
                         });
+            }
+        }
+
+        if(home){
+            if (!groupChat) {
+                if (chat.getFromPhone().equals(user.getPhoneNumber())){
+                    receiver = chat.getToPhone();
+                }else{
+                    receiver = chat.getFromPhone();
+                }
+            }
+        } else {
+            if (!groupChat) {
+                receiver = chat.getToPhone();
             }
         }
 
@@ -204,10 +232,6 @@ public class MessageActivity extends AppCompatActivity  {
             sendMessage(mSendButton);
             retrieveChatMessages();
         }
-
-
-
-
     }
 
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -268,7 +292,7 @@ public class MessageActivity extends AppCompatActivity  {
                                 fileId="ChatRooms/"+ groupName +"/"+ UUID.randomUUID().toString();
                                 Log.d("imagelink",fileId);
                             } else {
-                                fileId="Chats/"+ chatId(user.getPhoneNumber(), chat.getToPhone()) +"/"+ UUID.randomUUID().toString();
+                                fileId="Chats/"+ chat.getChatId() +"/"+ UUID.randomUUID().toString();
                                 Log.d("imagelink",fileId);
                             }
 
@@ -416,7 +440,7 @@ public class MessageActivity extends AppCompatActivity  {
                                              * the id generated from add does not automatically
                                              * have a timestamp as in push() from realtime database
                                              */
-                                            db.collection("chats").document(chatId(user.getPhoneNumber(), chat.getToPhone()))
+                                            db.collection("chats").document(chatId(user.getPhoneNumber(), receiver))
                                                     .collection("messages")
                                                     .add(message);
 
@@ -476,10 +500,10 @@ public class MessageActivity extends AppCompatActivity  {
     }
 
     /*
-    * Requires: QuerySnapshot, Boolean isGroup
+    * Requires: QuerySnapshot
     * Function: transforms documents into message object and adds them to the message list
     * */
-    private void retrieveMessages(QuerySnapshot queryDocumentSnapshots, Boolean isGroup){
+    private void retrieveMessages(QuerySnapshot queryDocumentSnapshots){
         for (DocumentChange dc : queryDocumentSnapshots.getDocumentChanges()) {
             switch (dc.getType()) {
                 case ADDED:
@@ -492,7 +516,7 @@ public class MessageActivity extends AppCompatActivity  {
                     if ((Boolean) Objects.requireNonNull(doc.get("file"))) {
 
                     } else {
-                        if (isGroup) {
+                        if (groupChat) {
                             message.setTextMessage(message.getSenderName()+": "+
                                     Objects.requireNonNull(doc.get("textMessage")).toString());
                         } else {
@@ -516,9 +540,7 @@ public class MessageActivity extends AppCompatActivity  {
     * Retrieves messages for one-to-one chats
     *  */
     private void retrieveChatMessages(){
-        final Boolean isGroup = false;
-
-        Log.d("chatId", chatId(user.getPhoneNumber(), chat.getToPhone()));
+        Log.d("chatId", chatId(user.getPhoneNumber(), receiver));
 
         Query query = db.collection("chats").document(chat.getChatId())
                 .collection("messages").orderBy("timestamp");
@@ -531,7 +553,7 @@ public class MessageActivity extends AppCompatActivity  {
                 }
 
                 assert queryDocumentSnapshots != null;
-                retrieveMessages(queryDocumentSnapshots, isGroup);
+                retrieveMessages(queryDocumentSnapshots);
         }
             });
     }
@@ -544,10 +566,10 @@ public class MessageActivity extends AppCompatActivity  {
     * */
     private void addToUserDocument(Message message){
 
-        String chatID = chatId(user.getPhoneNumber(), chat.getToPhone());
+        String chatID = chatId(user.getPhoneNumber(), receiver);
         db.collection("users").document(user.getPhoneNumber())
                 .collection("userchats").document(chatID).set(message);
-        db.collection("users").document(chat.getToPhone())
+        db.collection("users").document(receiver)
                 .collection("userchats").document(chatID).set(message);
     }
 
@@ -606,9 +628,6 @@ public class MessageActivity extends AppCompatActivity  {
     }
 
     private void retrieveGroupMessages(){
-
-        final Boolean isGroup = true;
-
         Query query = db.collection("ChatRooms").document(groupName)
                 .collection("messages").orderBy("timestamp");
         listenerRegistration = query.addSnapshotListener(new EventListener<QuerySnapshot>() {
@@ -620,7 +639,7 @@ public class MessageActivity extends AppCompatActivity  {
                 }
 
                 assert queryDocumentSnapshots != null;
-                retrieveMessages(queryDocumentSnapshots, isGroup);
+                retrieveMessages(queryDocumentSnapshots);
             }
         });
     }

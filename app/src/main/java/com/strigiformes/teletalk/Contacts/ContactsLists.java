@@ -33,13 +33,45 @@ import java.util.Objects;
 
 public class ContactsLists extends AppCompatActivity{
 
-    private static final String TAG = "tag";
-
+    /*
+    * Views and objects required for the custom adapter
+    * */
     private ListView mListView;
     private CustomListAdapter mAdapter;
-
     private List<User> appContacts = new ArrayList<User>();
-    private final FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_contacts_lists);
+
+        assert getSupportActionBar() != null;   //null check
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);   //show back button
+        setTitle("Select Contact");
+
+        mListView = findViewById(R.id.contacts_list);
+
+        //Retrieves the contacts list created in the home page
+        //creating the the list in homepage makes the loading faster
+        appContacts = (List<User>) getIntent().getExtras().getSerializable("APP_CONTACTS");
+
+        mAdapter = new CustomListAdapter(ContactsLists.this, R.layout.contact_list_item, appContacts);
+        mListView.setAdapter(mAdapter);
+
+        //Opens the chat activity for one-to-one chat
+        mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Intent intent = new Intent(ContactsLists.this, MessageActivity.class);
+                User contactSelected = appContacts.get(position);
+                ChatListItem chat = new ChatListItem(contactSelected.getName(), contactSelected.getPhoneNumber());
+                intent.putExtra("CHAT", chat);
+                startActivity(intent);
+            }
+        });
+        mAdapter.notifyDataSetChanged();
+    }
 
     /**
      * Called when the activity has detected the user's press of the back
@@ -56,40 +88,6 @@ public class ContactsLists extends AppCompatActivity{
         finish();
     }
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_contacts_lists);
-
-        assert getSupportActionBar() != null;   //null check
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);   //show back button
-        setTitle("Select Contact");
-
-        mListView = findViewById(R.id.contacts_list);
-
-        appContacts = (List<User>) getIntent().getExtras().getSerializable("APP_CONTACTS");
-
-        mAdapter = new CustomListAdapter(ContactsLists.this, R.layout.contact_list_item, appContacts);
-        mListView.setAdapter(mAdapter);
-
-        mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
-                Intent intent = new Intent(ContactsLists.this, MessageActivity.class);
-                User contactSelected = appContacts.get(position);
-                ChatListItem chat = new ChatListItem(contactSelected.getName(), contactSelected.getPhoneNumber());
-                intent.putExtra("CHAT", chat);
-                startActivity(intent);
-            }
-        });
-
-        mAdapter.notifyDataSetChanged();
-
-
-    }
-
     //on clicking back button finish activity and go back
     @Override
     public boolean onSupportNavigateUp(){
@@ -97,10 +95,12 @@ public class ContactsLists extends AppCompatActivity{
         return true;
     }
 
-
-
+    /*
+    * Requires: view used to start creation of the new chatroom
+    * Function: Starts new intent that allows the user to select
+    *           contacts to be added in the new chat
+    * */
     public void newChat(View view){
-
         Intent groupIntent = new Intent(ContactsLists.this, SelectGroupContacts.class);
         Bundle bundle = new Bundle();
         bundle.putSerializable("CONTACTS", (Serializable) appContacts);

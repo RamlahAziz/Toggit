@@ -12,6 +12,7 @@ public class ChatListItem implements Serializable {
     private String fromPhone;
     private String toPhone;
     private String groupName;
+    private String lastSeen;
     private Boolean isGroup = false;
 
     public ChatListItem() {
@@ -94,6 +95,14 @@ public class ChatListItem implements Serializable {
         isGroup = group;
     }
 
+    public String getLastSeen() {
+        return lastSeen;
+    }
+
+    public void setLastSeen(String lastSeen) {
+        this.lastSeen = lastSeen;
+    }
+
     @Override
     public String toString() {
         return "ChatListItem{" +
@@ -105,6 +114,8 @@ public class ChatListItem implements Serializable {
                 ", fromPhone='" + fromPhone + '\'' +
                 ", toPhone='" + toPhone + '\'' +
                 ", groupName='" + groupName + '\'' +
+                ", lastSeen='" + lastSeen + '\'' +
+                ", isGroup=" + isGroup +
                 '}';
     }
 }
