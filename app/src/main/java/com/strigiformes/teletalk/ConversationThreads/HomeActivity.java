@@ -8,7 +8,9 @@ import androidx.appcompat.widget.Toolbar;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.Cursor;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -19,8 +21,10 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.io.Serializable;
@@ -37,6 +41,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.strigiformes.teletalk.CustomObjects.ChatListItem;
 import com.strigiformes.teletalk.Contacts.ContactsLists;
@@ -67,6 +72,9 @@ public class HomeActivity extends AppCompatActivity {
 
     ListenerRegistration listenerRegistration;
 
+    private List<String> phoneContacts = new ArrayList<String>();
+    private List<User> appContacts = new ArrayList<User>();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -80,6 +88,7 @@ public class HomeActivity extends AppCompatActivity {
         mNoChatsLayout = findViewById(R.id.noChatsLayout);
         fab = findViewById(R.id.fab);
 
+        readContacts();
         showChats();
 
          mAdapter = new ChatListAdapter(HomeActivity.this, R.layout.activity_home, chatsList);
@@ -151,6 +160,9 @@ public class HomeActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Intent contactsIntent = new Intent(HomeActivity.this, ContactsLists.class);
+                Bundle bundle = new Bundle();
+                bundle.putSerializable("APP_CONTACTS", (Serializable) appContacts);
+                contactsIntent.putExtras(bundle);
                 startActivity(contactsIntent);
             }
         });
@@ -314,6 +326,60 @@ public class HomeActivity extends AppCompatActivity {
 
                 Intent mainIntent = new Intent(HomeActivity.this, MainActivity.class);
                 startActivity(mainIntent);
+    }
+
+    private void readContacts() {
+
+        phoneContacts.clear();
+        appContacts.clear();
+
+        Cursor phones = getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null,null,null, null);
+        while (phones.moveToNext())
+        {
+            //String name=phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
+            String phoneNo = phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
+
+            //remove white spaces
+            phoneNo = phoneNo.replaceAll("\\s+","");
+
+            int length = phoneNo.length();
+
+            //make sure you are not adding a landline number
+            if(length >= 10){
+
+                //convert format to match the format in the database
+                phoneNo = "+92"+phoneNo.substring(length-10);
+
+                //make sure the contacts are not repeated
+                if (!phoneContacts.contains(phoneNo)) {
+                    phoneContacts.add(phoneNo);
+                }
+            }
+        }
+        phones.close();
+
+        db.collection("users").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if (task.isSuccessful()) {
+                    for (QueryDocumentSnapshot document : Objects.requireNonNull(task.getResult())) {
+                        if(phoneContacts.contains(document.getId())){
+
+                            User user = new User();
+                            user.setName(Objects.requireNonNull(document.getData().get("name")).toString());
+                            user.setPhoneNumber(document.getId());
+                            user.setDeviceToken(Objects.requireNonNull(document.getData().get("tokenId")).toString());
+
+                            appContacts.add(user);
+                            mAdapter.notifyDataSetChanged();
+                        }
+                        Log.d(TAG, document.getId() + " => " + document.getData());
+                    }
+                } else {
+                    Log.d(TAG, "Error getting documents: ", task.getException());
+                }
+            }
+        });
     }
 
     /**
