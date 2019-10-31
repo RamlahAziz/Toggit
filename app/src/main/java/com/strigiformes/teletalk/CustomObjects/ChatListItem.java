@@ -12,6 +12,7 @@ public class ChatListItem implements Serializable {
     private String fromPhone;
     private String toPhone;
     private String groupName;
+    private Boolean isGroup = false;
 
     public ChatListItem() {
     }
@@ -83,6 +84,14 @@ public class ChatListItem implements Serializable {
 
     public void setGroupName(String groupName) {
         this.groupName = groupName;
+    }
+
+    public Boolean getGroup() {
+        return isGroup;
+    }
+
+    public void setGroup(Boolean group) {
+        isGroup = group;
     }
 
     @Override

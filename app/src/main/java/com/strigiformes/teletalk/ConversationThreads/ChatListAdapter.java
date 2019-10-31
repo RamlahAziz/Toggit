@@ -40,6 +40,8 @@ public class ChatListAdapter extends ArrayAdapter<ChatListItem> {
         mName.setText(getItem(position).getName());
         mPreview.setText(getItem(position).getMsgPreview());
 
+
+
         return customView;
     }
 

@@ -1,5 +1,6 @@
 package com.strigiformes.teletalk.ConversationThreads;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -13,10 +14,13 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.io.Serializable;
@@ -88,6 +92,8 @@ public class HomeActivity extends AppCompatActivity {
 
                 Intent chatIntent = new Intent(HomeActivity.this, MessageActivity.class);
                 Bundle bundle = new Bundle();
+                Log.d("new ChatsList", chatsList.toString());
+                Log.d("chatselected", chatsList.get(i).toString());
                 bundle.putSerializable("CHAT", chatsList.get(i));
                 if (chatsList.get(i).getToPhone()==null) {
                     bundle.putSerializable("GROUP_CHAT", true);
@@ -102,7 +108,7 @@ public class HomeActivity extends AppCompatActivity {
         mListView.setLongClickable(true);
         mListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
-            public boolean onItemLongClick(AdapterView<?> adapterView, View view, final int i, long l) {
+            public boolean onItemLongClick(AdapterView<?> adapterView, final View view, final int i, long l) {
 
                 // setup the alert builder
                 AlertDialog.Builder builder = new AlertDialog.Builder(HomeActivity.this);
@@ -118,7 +124,8 @@ public class HomeActivity extends AppCompatActivity {
                                 //archive(chatsList.get(i).getChatId());
                                 break;
                             case 1: // Delete
-                                //delete(chatsList.get(i).getChatId());
+                                ChatListItem chat = (ChatListItem) mListView.getItemAtPosition(i);
+                                deleteChat(chat, view);
                                 break;
                             case 2: // Block
                                 //block(chatsList.get(i).getChatId(), chatsList.get(i).getToPhone());
@@ -147,6 +154,24 @@ public class HomeActivity extends AppCompatActivity {
                 startActivity(contactsIntent);
             }
         });
+    }
+
+    /*
+    * Delete chate from user home
+    * not from database
+    * */
+    private void deleteChat(ChatListItem chat, View view){
+        String type;
+        if(chat.getGroup()){
+            type = "ChatRooms";
+        }else{
+            type = "userchats";
+        }
+        db.collection("users").document(user.getPhoneNumber())
+                .collection(type).document(chat.getChatId())
+                .delete();
+        chatsList.remove(chat);
+        mAdapter.notifyDataSetChanged();
     }
 
     //cannot go back to previous activity, closes down app to background
@@ -250,6 +275,7 @@ public class HomeActivity extends AppCompatActivity {
                     switch (dc.getType()) {
                         case ADDED:
                             ChatListItem chatListItem = new ChatListItem();
+                            chatListItem.setGroup(true);
                             chatListItem.setChatId(dc.getDocument().getId());
                             chatListItem.setName(dc.getDocument().getId());
                             Map<String, Object> doc =dc.getDocument().getData();

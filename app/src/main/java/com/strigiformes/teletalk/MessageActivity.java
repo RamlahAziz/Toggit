@@ -518,7 +518,9 @@ public class MessageActivity extends AppCompatActivity  {
     private void retrieveChatMessages(){
         final Boolean isGroup = false;
 
-        Query query = db.collection("chats").document(chatId(user.getPhoneNumber(), chat.getToPhone()))
+        Log.d("chatId", chatId(user.getPhoneNumber(), chat.getToPhone()));
+
+        Query query = db.collection("chats").document(chat.getChatId())
                 .collection("messages").orderBy("timestamp");
         listenerRegistration = query.addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
