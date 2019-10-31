@@ -487,6 +487,9 @@ public class MessageActivity extends AppCompatActivity  {
         }
     }
 
+    /*
+    * Retrieves messages for one-to-one chats
+    *  */
     private void retrieveChatMessages(){
         Query query = db.collection("chats").document(chatId(user.getPhoneNumber(), chat.getToPhone()))
                 .collection("messages").orderBy("timestamp");
