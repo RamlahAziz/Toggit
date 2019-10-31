@@ -409,6 +409,11 @@ public class HomeActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+    }
+
+    @Override
+    protected void onPostResume() {
+        super.onPostResume();
         readContacts();
     }
 
