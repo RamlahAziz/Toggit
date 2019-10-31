@@ -35,18 +35,10 @@ public class ChatListAdapter extends ArrayAdapter<ChatListItem> {
         View customView = myCustomInflater.inflate(R.layout.chat_home_card, parent, false);
 
         mName =  customView.findViewById(R.id.name_chat);
-        //mId =  customView.findViewById(R.id.pictureChat);
         mPreview =  customView.findViewById(R.id.lastMessage);
 
         mName.setText(getItem(position).getName());
         mPreview.setText(getItem(position).getMsgPreview());
-
-        /*if (getItem(position).getPictureUri()!= null) {
-
-            Log.d("testing ChatAdapter", "inside if");
-            //Glide.with(getContext()).load(Uri.parse(getItem(position).getPictureUri())).apply(RequestOptions.circleCropTransform().placeholder(R.drawable.ic_avatar)).into(mId);
-
-        }*/
 
         return customView;
     }

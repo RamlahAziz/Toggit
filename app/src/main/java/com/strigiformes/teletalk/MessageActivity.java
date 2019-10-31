@@ -42,6 +42,7 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.strigiformes.teletalk.ConversationThreads.HomeActivity;
 import com.strigiformes.teletalk.CustomObjects.ChatListItem;
 import com.strigiformes.teletalk.CustomObjects.Message;
 import com.strigiformes.teletalk.CustomObjects.User;
@@ -84,6 +85,23 @@ public class MessageActivity extends AppCompatActivity  {
     List<User> groupList;
     private String groupName;
     Boolean groupChat = false;
+
+    /**
+     * Called when the activity has detected the user's press of the back
+     * key. The {@link #getOnBackPressedDispatcher() OnBackPressedDispatcher} will be given a
+     * chance to handle the back button before the default behavior of
+     * {@link Activity#onBackPressed()} is invoked.
+     *
+     * @see #getOnBackPressedDispatcher()
+     *
+     * Go to chatsList (HomeActivity) on leaving chat
+     */
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        startActivity(new Intent(MessageActivity.this, HomeActivity.class));
+        finish();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -186,6 +204,8 @@ public class MessageActivity extends AppCompatActivity  {
             sendMessage(mSendButton);
             retrieveChatMessages();
         }
+
+
 
 
     }
