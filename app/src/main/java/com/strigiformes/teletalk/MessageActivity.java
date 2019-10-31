@@ -456,10 +456,10 @@ public class MessageActivity extends AppCompatActivity  {
     }
 
     /*
-    * Requires: QuerySnapshot
+    * Requires: QuerySnapshot, Boolean isGroup
     * Function: transforms documents into message object and adds them to the message list
     * */
-    private void retrieveMessages(QuerySnapshot queryDocumentSnapshots){
+    private void retrieveMessages(QuerySnapshot queryDocumentSnapshots, Boolean isGroup){
         for (DocumentChange dc : queryDocumentSnapshots.getDocumentChanges()) {
             switch (dc.getType()) {
                 case ADDED:
@@ -472,7 +472,12 @@ public class MessageActivity extends AppCompatActivity  {
                     if ((Boolean) Objects.requireNonNull(doc.get("file"))) {
 
                     } else {
-                        message.setTextMessage(Objects.requireNonNull(doc.get("textMessage")).toString());
+                        if (isGroup) {
+                            message.setTextMessage(message.getSenderName()+": "+
+                                    Objects.requireNonNull(doc.get("textMessage")).toString());
+                        } else {
+                            message.setTextMessage(Objects.requireNonNull(doc.get("textMessage")).toString());
+                        }
                     }
                     messageList.add(message);
                     mMessageAdapter.notifyDataSetChanged();
@@ -491,6 +496,8 @@ public class MessageActivity extends AppCompatActivity  {
     * Retrieves messages for one-to-one chats
     *  */
     private void retrieveChatMessages(){
+        final Boolean isGroup = false;
+
         Query query = db.collection("chats").document(chatId(user.getPhoneNumber(), chat.getToPhone()))
                 .collection("messages").orderBy("timestamp");
         listenerRegistration = query.addSnapshotListener(new EventListener<QuerySnapshot>() {
@@ -502,7 +509,7 @@ public class MessageActivity extends AppCompatActivity  {
                 }
 
                 assert queryDocumentSnapshots != null;
-                retrieveMessages(queryDocumentSnapshots);
+                retrieveMessages(queryDocumentSnapshots, isGroup);
         }
             });
     }
@@ -577,6 +584,9 @@ public class MessageActivity extends AppCompatActivity  {
     }
 
     private void retrieveGroupMessages(){
+
+        final Boolean isGroup = true;
+
         Query query = db.collection("ChatRooms").document(groupName)
                 .collection("messages").orderBy("timestamp");
         listenerRegistration = query.addSnapshotListener(new EventListener<QuerySnapshot>() {
@@ -588,7 +598,7 @@ public class MessageActivity extends AppCompatActivity  {
                 }
 
                 assert queryDocumentSnapshots != null;
-                retrieveMessages(queryDocumentSnapshots);
+                retrieveMessages(queryDocumentSnapshots, isGroup);
             }
         });
     }
