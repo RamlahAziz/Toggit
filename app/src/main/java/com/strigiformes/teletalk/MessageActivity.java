@@ -360,6 +360,12 @@ public class MessageActivity extends AppCompatActivity  {
         return size;
     }
 
+    /*
+    * Requires: Message object with the content field already set
+    * function: sets the remaining fields for the message object
+    *           adds the message to the thread in the database
+    *           call addToUserDocument()
+    * */
     private void makeMessage(Message m){
 
         final Message message = m;
@@ -403,6 +409,11 @@ public class MessageActivity extends AppCompatActivity  {
                 });
     }
 
+    /*
+    * requires: send button id
+    * functions: checks that input message is not empty
+    *           and calls makeMessage()
+    * */
     private void sendMessage(Button button){
 
         button.setOnClickListener(new View.OnClickListener() {
@@ -422,6 +433,10 @@ public class MessageActivity extends AppCompatActivity  {
         });
     }
 
+    /*
+    * creates chat id for one-on-one chats by comparing the phone numbers
+    * of the sender and the receiver
+    * */
     public String chatId(String sender, String receiver) {
 
         String chatId;
@@ -440,6 +455,10 @@ public class MessageActivity extends AppCompatActivity  {
         return chatId;
     }
 
+    /*
+    * Requires: QuerySnapshot
+    * Function: transforms documents into message object and adds them to the message list
+    * */
     private void retrieveMessages(QuerySnapshot queryDocumentSnapshots){
         for (DocumentChange dc : queryDocumentSnapshots.getDocumentChanges()) {
             switch (dc.getType()) {
@@ -470,7 +489,7 @@ public class MessageActivity extends AppCompatActivity  {
 
     private void retrieveChatMessages(){
         Query query = db.collection("chats").document(chatId(user.getPhoneNumber(), chat.getToPhone()))
-                .collection("messages");
+                .collection("messages").orderBy("timestamp");
         listenerRegistration = query.addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
@@ -485,6 +504,12 @@ public class MessageActivity extends AppCompatActivity  {
             });
     }
 
+    /*
+    * Requires: Message object with all field set
+    * Function: updates the the chats document within the chats collection
+    *           in the user document (used to show the chats preview in the
+    *           for the home page of the user)
+    * */
     private void addToUserDocument(Message message){
 
         String chatID = chatId(user.getPhoneNumber(), chat.getToPhone());
@@ -550,7 +575,7 @@ public class MessageActivity extends AppCompatActivity  {
 
     private void retrieveGroupMessages(){
         Query query = db.collection("ChatRooms").document(groupName)
-                .collection("messages");
+                .collection("messages").orderBy("timestamp");
         listenerRegistration = query.addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
