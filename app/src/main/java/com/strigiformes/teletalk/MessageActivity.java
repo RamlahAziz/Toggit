@@ -42,6 +42,7 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.strigiformes.teletalk.ConversationThreads.HomeActivity;
 import com.strigiformes.teletalk.CustomObjects.ChatListItem;
 import com.strigiformes.teletalk.CustomObjects.Message;
 import com.strigiformes.teletalk.CustomObjects.User;
@@ -84,6 +85,23 @@ public class MessageActivity extends AppCompatActivity  {
     List<User> groupList;
     private String groupName;
     Boolean groupChat = false;
+
+    /**
+     * Called when the activity has detected the user's press of the back
+     * key. The {@link #getOnBackPressedDispatcher() OnBackPressedDispatcher} will be given a
+     * chance to handle the back button before the default behavior of
+     * {@link Activity#onBackPressed()} is invoked.
+     *
+     * @see #getOnBackPressedDispatcher()
+     *
+     * Go to chatsList (HomeActivity) on leaving chat
+     */
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        startActivity(new Intent(MessageActivity.this, HomeActivity.class));
+        finish();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -186,6 +204,8 @@ public class MessageActivity extends AppCompatActivity  {
             sendMessage(mSendButton);
             retrieveChatMessages();
         }
+
+
 
 
     }
@@ -360,6 +380,12 @@ public class MessageActivity extends AppCompatActivity  {
         return size;
     }
 
+    /*
+    * Requires: Message object with the content field already set
+    * function: sets the remaining fields for the message object
+    *           adds the message to the thread in the database
+    *           call addToUserDocument()
+    * */
     private void makeMessage(Message m){
 
         final Message message = m;
@@ -403,6 +429,11 @@ public class MessageActivity extends AppCompatActivity  {
                 });
     }
 
+    /*
+    * requires: send button id
+    * functions: checks that input message is not empty
+    *           and calls makeMessage()
+    * */
     private void sendMessage(Button button){
 
         button.setOnClickListener(new View.OnClickListener() {
@@ -422,6 +453,10 @@ public class MessageActivity extends AppCompatActivity  {
         });
     }
 
+    /*
+    * creates chat id for one-on-one chats by comparing the phone numbers
+    * of the sender and the receiver
+    * */
     public String chatId(String sender, String receiver) {
 
         String chatId;
@@ -440,7 +475,11 @@ public class MessageActivity extends AppCompatActivity  {
         return chatId;
     }
 
-    private void retrieveMessages(QuerySnapshot queryDocumentSnapshots){
+    /*
+    * Requires: QuerySnapshot, Boolean isGroup
+    * Function: transforms documents into message object and adds them to the message list
+    * */
+    private void retrieveMessages(QuerySnapshot queryDocumentSnapshots, Boolean isGroup){
         for (DocumentChange dc : queryDocumentSnapshots.getDocumentChanges()) {
             switch (dc.getType()) {
                 case ADDED:
@@ -453,7 +492,12 @@ public class MessageActivity extends AppCompatActivity  {
                     if ((Boolean) Objects.requireNonNull(doc.get("file"))) {
 
                     } else {
-                        message.setTextMessage(Objects.requireNonNull(doc.get("textMessage")).toString());
+                        if (isGroup) {
+                            message.setTextMessage(message.getSenderName()+": "+
+                                    Objects.requireNonNull(doc.get("textMessage")).toString());
+                        } else {
+                            message.setTextMessage(Objects.requireNonNull(doc.get("textMessage")).toString());
+                        }
                     }
                     messageList.add(message);
                     mMessageAdapter.notifyDataSetChanged();
@@ -468,9 +512,16 @@ public class MessageActivity extends AppCompatActivity  {
         }
     }
 
+    /*
+    * Retrieves messages for one-to-one chats
+    *  */
     private void retrieveChatMessages(){
-        Query query = db.collection("chats").document(chatId(user.getPhoneNumber(), chat.getToPhone()))
-                .collection("messages");
+        final Boolean isGroup = false;
+
+        Log.d("chatId", chatId(user.getPhoneNumber(), chat.getToPhone()));
+
+        Query query = db.collection("chats").document(chat.getChatId())
+                .collection("messages").orderBy("timestamp");
         listenerRegistration = query.addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
@@ -480,11 +531,17 @@ public class MessageActivity extends AppCompatActivity  {
                 }
 
                 assert queryDocumentSnapshots != null;
-                retrieveMessages(queryDocumentSnapshots);
+                retrieveMessages(queryDocumentSnapshots, isGroup);
         }
             });
     }
 
+    /*
+    * Requires: Message object with all field set
+    * Function: updates the the chats document within the chats collection
+    *           in the user document (used to show the chats preview in the
+    *           for the home page of the user)
+    * */
     private void addToUserDocument(Message message){
 
         String chatID = chatId(user.getPhoneNumber(), chat.getToPhone());
@@ -549,8 +606,11 @@ public class MessageActivity extends AppCompatActivity  {
     }
 
     private void retrieveGroupMessages(){
+
+        final Boolean isGroup = true;
+
         Query query = db.collection("ChatRooms").document(groupName)
-                .collection("messages");
+                .collection("messages").orderBy("timestamp");
         listenerRegistration = query.addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
@@ -560,7 +620,7 @@ public class MessageActivity extends AppCompatActivity  {
                 }
 
                 assert queryDocumentSnapshots != null;
-                retrieveMessages(queryDocumentSnapshots);
+                retrieveMessages(queryDocumentSnapshots, isGroup);
             }
         });
     }
