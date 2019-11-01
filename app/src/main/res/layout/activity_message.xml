@@ -63,7 +63,7 @@
             android:layout_height="48dp"
             android:padding="10dp"
             android:scaleType="fitCenter"
-            app:srcCompat="@drawable/attachment" />
+            app:srcCompat="@drawable/fileatt" />
 
         <EditText
             android:id="@+id/edittext_chatbox"
