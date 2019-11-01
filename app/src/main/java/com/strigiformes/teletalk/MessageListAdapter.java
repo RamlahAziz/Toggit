@@ -12,6 +12,7 @@ import android.widget.TextView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.bumptech.glide.request.RequestOptions;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -60,7 +61,7 @@ public class MessageListAdapter extends RecyclerView.Adapter {
 
         if (message.getIdSender().equals(phone_Number)) {
             if(message.getFile()){
-                Log.d("MessageListAdapter",String.valueOf(message.getFile()));
+                //Log.d("MessageListAdapter",String.valueOf(message.getFile()));
                 //if message is file and current user is the sender of the message
                 return VIEW_TYPE_IMAGE_SENT;
             }
@@ -170,6 +171,13 @@ public class MessageListAdapter extends RecyclerView.Adapter {
         TextView messageText, timeText, nameText;
         ImageView Image;
 
+        int sCorner = 15;
+        int sMargin = 20;
+
+        int sBorder = 10;
+        String sColor = "#F7CF70";
+
+
         ReceivedImageHolder(View itemView) {
             super(itemView);
 
@@ -180,10 +188,14 @@ public class MessageListAdapter extends RecyclerView.Adapter {
 
         void bind(Message message) {
 
+            //https://github.com/thedeveloperworldisyours/RoundedConersWithGlide
             messageText.setText(message.getTextMessage());
             timeText.setText(new SimpleDateFormat("hh:mm aaa").format(new Date(message.getTimestamp())));
             Glide.with(mContext).
-                    load(Uri.parse(message.getTextMessage()))
+                    load(Uri.parse(message.getFileLoction()))
+                    .error(R.drawable.attachment)
+                    .apply(RequestOptions.bitmapTransform(
+                            new RoundedCornersTransformation(mContext,  sCorner, sColor, sBorder)))
                     .into(Image);
         }
     }
@@ -191,6 +203,12 @@ public class MessageListAdapter extends RecyclerView.Adapter {
     private class SentImageHolder extends RecyclerView.ViewHolder {
         TextView messageText, timeText, nameText;
         ImageView Image;
+
+        int sCorner = 15;
+        int sMargin = 20;
+
+        int sBorder = 10;
+        String sColor = "#73D88A";
 
         SentImageHolder(View itemView) {
             super(itemView);
@@ -204,8 +222,12 @@ public class MessageListAdapter extends RecyclerView.Adapter {
 
             messageText.setText(message.getTextMessage());
             timeText.setText(new SimpleDateFormat("hh:mm aaa").format(new Date(message.getTimestamp())));
+            Log.d("ImageUri",message.getFileLoction());
             Glide.with(mContext).
-                    load(Uri.parse(message.getTextMessage()))
+                    load(Uri.parse(message.getFileLoction()))
+                    .error(R.drawable.attachment)
+                    .apply(RequestOptions.bitmapTransform(
+                            new RoundedCornersTransformation(mContext,  sCorner, sColor, sBorder)))
                     .into(Image);
         }
     }

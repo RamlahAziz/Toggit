@@ -316,6 +316,8 @@ public class MessageActivity extends AppCompatActivity  {
 
                                                     message.setTextMessage(mFileName);
                                                     message.setFile(true);
+                                                    Log.d("ImageUriActivity",uri.toString());
+
                                                     message.setFileLoction(uri.toString());
 
                                                     makeMessage(message);
@@ -515,6 +517,9 @@ public class MessageActivity extends AppCompatActivity  {
                     message.setIdSender(Objects.requireNonNull(doc.get("idSender")).toString());
                     message.setTimestamp((Long) doc.get("timestamp"));
                     if ((Boolean) Objects.requireNonNull(doc.get("file"))) {
+                        message.setFile(true);
+                        message.setFileLoction(doc.get("fileLoction").toString());
+                        message.setTextMessage(doc.get("textMessage").toString());
 
                     } else {
                         if (groupChat) {
