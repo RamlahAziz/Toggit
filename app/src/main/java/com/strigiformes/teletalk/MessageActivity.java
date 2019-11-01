@@ -16,6 +16,7 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.provider.OpenableColumns;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -307,7 +308,6 @@ public class MessageActivity extends AppCompatActivity  {
                                                     Log.d("Driver Upload", "onSuccess: uri= "+ uri.toString());
 
                                                     Message message = new Message();
-                                                    message.setFileLoction(uri.toString());
                                                     /*
                                                     * TODO RAMLAH this text message needs to be a clickable
                                                     *  widget that opens the file in the required reader
@@ -316,6 +316,7 @@ public class MessageActivity extends AppCompatActivity  {
 
                                                     message.setTextMessage(mFileName);
                                                     message.setFile(true);
+                                                    message.setFileLoction(uri.toString());
 
                                                     makeMessage(message);
 

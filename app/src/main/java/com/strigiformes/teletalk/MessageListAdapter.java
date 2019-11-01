@@ -1,13 +1,18 @@
 package com.strigiformes.teletalk;
 
 import android.content.Context;
+import android.net.Uri;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.strigiformes.teletalk.CustomObjects.Message;
@@ -20,6 +25,8 @@ public class MessageListAdapter extends RecyclerView.Adapter {
 
     private static final int VIEW_TYPE_MESSAGE_SENT = 1;
     private static final int VIEW_TYPE_MESSAGE_RECEIVED = 2;
+    private static final int VIEW_TYPE_IMAGE_SENT = 3;
+    private static final int VIEW_TYPE_IMAGE_RECEIVED = 4;
 
     private Context mContext;
     private List<Message> mMessageList;
@@ -52,11 +59,26 @@ public class MessageListAdapter extends RecyclerView.Adapter {
         phone_Number = user.getPhoneNumber();
 
         if (message.getIdSender().equals(phone_Number)) {
-            // If the current user is the sender of the message
-            return VIEW_TYPE_MESSAGE_SENT;
+            if(message.getFile()){
+                Log.d("MessageListAdapter",String.valueOf(message.getFile()));
+                //if message is file and current user is the sender of the message
+                return VIEW_TYPE_IMAGE_SENT;
+            }
+            else{
+                // If the message is text current user is the sender of the message
+                return VIEW_TYPE_MESSAGE_SENT;
+            }
+
         } else {
-            // If some other user sent the message
-            return VIEW_TYPE_MESSAGE_RECEIVED;
+            if(message.getFile()){
+                //if message is file and some other user sent the message
+                return VIEW_TYPE_IMAGE_RECEIVED;
+            }
+            else{
+                // If message is text some other user sent the message
+                return VIEW_TYPE_MESSAGE_RECEIVED;
+            }
+
         }
     }
 
@@ -73,6 +95,14 @@ public class MessageListAdapter extends RecyclerView.Adapter {
             view = LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.item_message_received, parent, false);
             return new ReceivedMessageHolder(view);
+        } else if (viewType == VIEW_TYPE_IMAGE_SENT) {
+            view = LayoutInflater.from(parent.getContext())
+                    .inflate(R.layout.item_image_sent, parent, false);
+            return new SentImageHolder(view);
+        } else if (viewType == VIEW_TYPE_IMAGE_RECEIVED) {
+            view = LayoutInflater.from(parent.getContext())
+                    .inflate(R.layout.item_image_received, parent, false);
+            return new ReceivedImageHolder(view);
         }
 
         return null;
@@ -89,6 +119,13 @@ public class MessageListAdapter extends RecyclerView.Adapter {
                 break;
             case VIEW_TYPE_MESSAGE_RECEIVED:
                 ((ReceivedMessageHolder) holder).bind(message);
+                break;
+            case VIEW_TYPE_IMAGE_SENT:
+                ((SentImageHolder) holder).bind(message);
+                break;
+            case VIEW_TYPE_IMAGE_RECEIVED:
+                ((ReceivedImageHolder) holder).bind(message);
+                break;
         }
     }
 
@@ -112,7 +149,8 @@ public class MessageListAdapter extends RecyclerView.Adapter {
     }
 
     private class ReceivedMessageHolder extends RecyclerView.ViewHolder {
-        TextView messageText, timeText;
+        TextView messageText, timeText, nameText;
+        ImageView profileImage;
 
         ReceivedMessageHolder(View itemView) {
             super(itemView);
@@ -127,4 +165,49 @@ public class MessageListAdapter extends RecyclerView.Adapter {
             timeText.setText(new SimpleDateFormat("hh:mm aaa").format(new Date(message.getTimestamp())));
         }
     }
+
+    private class ReceivedImageHolder extends RecyclerView.ViewHolder {
+        TextView messageText, timeText, nameText;
+        ImageView Image;
+
+        ReceivedImageHolder(View itemView) {
+            super(itemView);
+
+            Image = itemView.findViewById(R.id.item_image_received);
+            messageText =  itemView.findViewById(R.id.text_message_body);
+            timeText =  itemView.findViewById(R.id.text_message_time);
+        }
+
+        void bind(Message message) {
+
+            messageText.setText(message.getTextMessage());
+            timeText.setText(new SimpleDateFormat("hh:mm aaa").format(new Date(message.getTimestamp())));
+            Glide.with(mContext).
+                    load(Uri.parse(message.getTextMessage()))
+                    .into(Image);
+        }
+    }
+
+    private class SentImageHolder extends RecyclerView.ViewHolder {
+        TextView messageText, timeText, nameText;
+        ImageView Image;
+
+        SentImageHolder(View itemView) {
+            super(itemView);
+
+            Image = itemView.findViewById(R.id.item_image_sent);
+            messageText =  itemView.findViewById(R.id.text_message_body);
+            timeText =  itemView.findViewById(R.id.text_message_time);
+        }
+
+        void bind(Message message) {
+
+            messageText.setText(message.getTextMessage());
+            timeText.setText(new SimpleDateFormat("hh:mm aaa").format(new Date(message.getTimestamp())));
+            Glide.with(mContext).
+                    load(Uri.parse(message.getTextMessage()))
+                    .into(Image);
+        }
+    }
+
 }
