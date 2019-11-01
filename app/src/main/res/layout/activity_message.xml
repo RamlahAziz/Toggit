@@ -11,7 +11,7 @@
     <TextView
         android:id="@+id/noMessageLayout"
         android:visibility="gone"
-        android:drawableTop="@drawable/ic_test"
+        android:drawableTop="@drawable/nochat"
         android:drawablePadding="24dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -91,7 +91,8 @@
             android:layout_width="64dp"
             android:layout_height="48dp"
             android:gravity="center"
-            android:layout_gravity="bottom" />
+            android:layout_gravity="bottom"
+            />
 
     </LinearLayout>
 
