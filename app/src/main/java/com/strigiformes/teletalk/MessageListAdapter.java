@@ -1,11 +1,9 @@
 package com.strigiformes.teletalk;
 
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.recyclerview.widget.RecyclerView;
@@ -32,34 +30,23 @@ public class MessageListAdapter extends RecyclerView.Adapter {
     private FirebaseUser user = mauth.getCurrentUser();
 
     public MessageListAdapter(Context context, List<Message> messageList) {
-
-        Log.d("testing3 messageAdapter", "inside constructor");
-
         mContext = context;
         mMessageList = messageList;
-
     }
 
     @Override
     public int getItemCount() {
-
-        Log.d("testing4 messageAdapter", String.valueOf(mMessageList.size()));
-        Log.d("testing messageAdapter", mMessageList.toString());
-
         return mMessageList.size();
     }
 
     @Override
     public long getItemId(int position){
-        Log.d("testing messageAdapter", "inside getItemPosition");
         return position;
     }
 
     // Determines the appropriate ViewType according to the sender of the message.
     @Override
     public int getItemViewType(int position) {
-
-        Log.d("testing0 messageAdaper", "inside messageListAdapter");
 
         Message message =  mMessageList.get(position);
         phone_Number = user.getPhoneNumber();
@@ -78,8 +65,6 @@ public class MessageListAdapter extends RecyclerView.Adapter {
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view;
 
-        Log.d("testing1 messageAdapter", "inside onCreateViewHolder");
-
         if (viewType == VIEW_TYPE_MESSAGE_SENT) {
             view = LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.item_message_sent, parent, false);
@@ -97,8 +82,6 @@ public class MessageListAdapter extends RecyclerView.Adapter {
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
         Message message =  mMessageList.get(position);
-
-        Log.d("testing2 messageAdaper", "inside onBindViewHolder");
 
         switch (holder.getItemViewType()) {
             case VIEW_TYPE_MESSAGE_SENT:
@@ -129,8 +112,7 @@ public class MessageListAdapter extends RecyclerView.Adapter {
     }
 
     private class ReceivedMessageHolder extends RecyclerView.ViewHolder {
-        TextView messageText, timeText, nameText;
-        ImageView profileImage;
+        TextView messageText, timeText;
 
         ReceivedMessageHolder(View itemView) {
             super(itemView);

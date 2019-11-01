@@ -42,14 +42,12 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.strigiformes.teletalk.ConversationThreads.HomeActivity;
 import com.strigiformes.teletalk.CustomObjects.ChatListItem;
 import com.strigiformes.teletalk.CustomObjects.Message;
 import com.strigiformes.teletalk.CustomObjects.User;
 
-import org.w3c.dom.Document;
-
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -59,6 +57,13 @@ import java.util.UUID;
 public class MessageActivity extends AppCompatActivity  {
 
     //private static final int ACTIVITY_NUM = 1;
+    private String TAG = "MessageListActivity";
+    private static final int GET_FROM_PHONE = 1;
+
+    private FirebaseAuth mauth = FirebaseAuth.getInstance();
+    private FirebaseUser user = mauth.getCurrentUser();
+    private final FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private ListenerRegistration listenerRegistration;
 
     private RecyclerView mMessageRecycler;
     private MessageListAdapter mMessageAdapter;
@@ -68,22 +73,48 @@ public class MessageActivity extends AppCompatActivity  {
     private View mNoMessageLayout;
 
     private List<Message> messageList = new ArrayList<>();
-
     private ChatListItem chat;
-    private String TAG = "MessageListActivity";
-
-    private FirebaseAuth mauth = FirebaseAuth.getInstance();
-    private FirebaseUser user = mauth.getCurrentUser();
-    private final FirebaseFirestore db = FirebaseFirestore.getInstance();
-
-    private static final int GET_FROM_PHONE = 1;
     private String mFileName;
+    private String receiver;
 
-    private ListenerRegistration listenerRegistration;
     //For Group chat rooms
     List<User> groupList;
     private String groupName;
     Boolean groupChat = false;
+    Boolean home= false;
+
+    /**
+     * Called when the activity has detected the user's press of the back
+     * key. The {@link #getOnBackPressedDispatcher() OnBackPressedDispatcher} will be given a
+     * chance to handle the back button before the default behavior of
+     * {@link Activity#onBackPressed()} is invoked.
+     *
+     * @see #getOnBackPressedDispatcher()
+     *
+     * Go to chatsList (HomeActivity) on leaving chat
+     */
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+
+        //update lastseen of the chat
+        Map<String, Object> data = new HashMap<>();
+        data.put("lastSeen", System.currentTimeMillis());
+
+        String type;
+        if(groupChat){
+            type = "ChatRooms";
+        } else {
+            type = "userchats";
+        }
+
+        db.collection("users").document(user.getPhoneNumber())
+                .collection(type).document(chat.getChatId())
+                .set(data, SetOptions.merge());
+
+        startActivity(new Intent(MessageActivity.this, HomeActivity.class));
+        finish();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,12 +123,16 @@ public class MessageActivity extends AppCompatActivity  {
 
         Intent i = getIntent();
         chat = (ChatListItem) i.getSerializableExtra("CHAT");
+        home = Objects.requireNonNull(getIntent().getExtras()).getBoolean("HOME");
 
         if(getIntent().getExtras().getSerializable("GROUP_CHAT") != null){
+
             groupChat = (Boolean) getIntent().getExtras().getSerializable("GROUP_CHAT");
             groupName = (String) getIntent().getExtras().getSerializable("GROUP_NAME");
+
             //if group chat is opened from create group
             groupList = (List<User>) getIntent().getExtras().getSerializable("CONTACTS");
+
             //if group chat is opened form home page
             if(groupList == null){
                 groupList = new ArrayList<User>();
@@ -115,7 +150,7 @@ public class MessageActivity extends AppCompatActivity  {
                                         ArrayList<Map<String, Object>> arrayList = (ArrayList<Map<String, Object>>) entry.getValue();
 
                                         for (Map<String, Object> userEntry : arrayList) {
-                                            final ObjectMapper mapper = new ObjectMapper(); // jackson's objectmapper
+                                            final ObjectMapper mapper = new ObjectMapper();
                                             final User groupMember = mapper.convertValue(userEntry, User.class);
                                             groupList.add(groupMember);
                                         }
@@ -127,9 +162,19 @@ public class MessageActivity extends AppCompatActivity  {
             }
         }
 
-
-
-
+        if(home){
+            if (!groupChat) {
+                if (chat.getFromPhone().equals(user.getPhoneNumber())){
+                    receiver = chat.getToPhone();
+                }else{
+                    receiver = chat.getFromPhone();
+                }
+            }
+        } else {
+            if (!groupChat) {
+                receiver = chat.getToPhone();
+            }
+        }
 
         assert getSupportActionBar() != null;   //null check
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);   //show back button
@@ -140,7 +185,6 @@ public class MessageActivity extends AppCompatActivity  {
         } else{
             setTitle(chat.getName());
         }
-
 
         user = mauth.getCurrentUser();
 
@@ -188,8 +232,6 @@ public class MessageActivity extends AppCompatActivity  {
             sendMessage(mSendButton);
             retrieveChatMessages();
         }
-
-
     }
 
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -250,7 +292,7 @@ public class MessageActivity extends AppCompatActivity  {
                                 fileId="ChatRooms/"+ groupName +"/"+ UUID.randomUUID().toString();
                                 Log.d("imagelink",fileId);
                             } else {
-                                fileId="Chats/"+ chatId(user.getPhoneNumber(), chat.getToPhone()) +"/"+ UUID.randomUUID().toString();
+                                fileId="Chats/"+ chat.getChatId() +"/"+ UUID.randomUUID().toString();
                                 Log.d("imagelink",fileId);
                             }
 
@@ -362,6 +404,12 @@ public class MessageActivity extends AppCompatActivity  {
         return size;
     }
 
+    /*
+    * Requires: Message object with the content field already set
+    * function: sets the remaining fields for the message object
+    *           adds the message to the thread in the database
+    *           call addToUserDocument()
+    * */
     private void makeMessage(Message m){
 
         final Message message = m;
@@ -392,7 +440,7 @@ public class MessageActivity extends AppCompatActivity  {
                                              * the id generated from add does not automatically
                                              * have a timestamp as in push() from realtime database
                                              */
-                                            db.collection("chats").document(chatId(user.getPhoneNumber(), chat.getToPhone()))
+                                            db.collection("chats").document(chatId(user.getPhoneNumber(), receiver))
                                                     .collection("messages")
                                                     .add(message);
 
@@ -405,6 +453,11 @@ public class MessageActivity extends AppCompatActivity  {
                 });
     }
 
+    /*
+    * requires: send button id
+    * functions: checks that input message is not empty
+    *           and calls makeMessage()
+    * */
     private void sendMessage(Button button){
 
         button.setOnClickListener(new View.OnClickListener() {
@@ -424,6 +477,10 @@ public class MessageActivity extends AppCompatActivity  {
         });
     }
 
+    /*
+    * creates chat id for one-on-one chats by comparing the phone numbers
+    * of the sender and the receiver
+    * */
     public String chatId(String sender, String receiver) {
 
         String chatId;
@@ -442,6 +499,10 @@ public class MessageActivity extends AppCompatActivity  {
         return chatId;
     }
 
+    /*
+    * Requires: QuerySnapshot
+    * Function: transforms documents into message object and adds them to the message list
+    * */
     private void retrieveMessages(QuerySnapshot queryDocumentSnapshots){
         for (DocumentChange dc : queryDocumentSnapshots.getDocumentChanges()) {
             switch (dc.getType()) {
@@ -455,7 +516,12 @@ public class MessageActivity extends AppCompatActivity  {
                     if ((Boolean) Objects.requireNonNull(doc.get("file"))) {
 
                     } else {
-                        message.setTextMessage(Objects.requireNonNull(doc.get("textMessage")).toString());
+                        if (groupChat) {
+                            message.setTextMessage(message.getSenderName()+": "+
+                                    Objects.requireNonNull(doc.get("textMessage")).toString());
+                        } else {
+                            message.setTextMessage(Objects.requireNonNull(doc.get("textMessage")).toString());
+                        }
                     }
                     messageList.add(message);
                     mMessageAdapter.notifyDataSetChanged();
@@ -470,9 +536,14 @@ public class MessageActivity extends AppCompatActivity  {
         }
     }
 
+    /*
+    * Retrieves messages for one-to-one chats
+    *  */
     private void retrieveChatMessages(){
-        Query query = db.collection("chats").document(chatId(user.getPhoneNumber(), chat.getToPhone()))
-                .collection("messages");
+        Log.d("chatId", chatId(user.getPhoneNumber(), receiver));
+
+        Query query = db.collection("chats").document(chat.getChatId())
+                .collection("messages").orderBy("timestamp");
         listenerRegistration = query.addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
@@ -487,12 +558,18 @@ public class MessageActivity extends AppCompatActivity  {
             });
     }
 
+    /*
+    * Requires: Message object with all field set
+    * Function: updates the the chats document within the chats collection
+    *           in the user document (used to show the chats preview in the
+    *           for the home page of the user)
+    * */
     private void addToUserDocument(Message message){
 
-        String chatID = chatId(user.getPhoneNumber(), chat.getToPhone());
+        String chatID = chatId(user.getPhoneNumber(), receiver);
         db.collection("users").document(user.getPhoneNumber())
                 .collection("userchats").document(chatID).set(message);
-        db.collection("users").document(chat.getToPhone())
+        db.collection("users").document(receiver)
                 .collection("userchats").document(chatID).set(message);
     }
 
@@ -552,7 +629,7 @@ public class MessageActivity extends AppCompatActivity  {
 
     private void retrieveGroupMessages(){
         Query query = db.collection("ChatRooms").document(groupName)
-                .collection("messages");
+                .collection("messages").orderBy("timestamp");
         listenerRegistration = query.addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {

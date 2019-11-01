@@ -1,5 +1,6 @@
 package com.strigiformes.teletalk.Contacts;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.database.Cursor;
 import android.provider.ContactsContract;
@@ -18,6 +19,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.strigiformes.teletalk.ConversationThreads.HomeActivity;
 import com.strigiformes.teletalk.CustomObjects.ChatListItem;
 import com.strigiformes.teletalk.CustomObjects.User;
 import com.strigiformes.teletalk.GroupCreation.SelectGroupContacts;
@@ -31,14 +33,12 @@ import java.util.Objects;
 
 public class ContactsLists extends AppCompatActivity{
 
-    private static final String TAG = "tag";
-
+    /*
+    * Views and objects required for the custom adapter
+    * */
     private ListView mListView;
     private CustomListAdapter mAdapter;
-
-    private List<String> phoneContacts = new ArrayList<String>();
     private List<User> appContacts = new ArrayList<User>();
-    private final FirebaseFirestore db = FirebaseFirestore.getInstance();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,15 +52,17 @@ public class ContactsLists extends AppCompatActivity{
 
         mListView = findViewById(R.id.contacts_list);
 
-        readContacts();
+        //Retrieves the contacts list created in the home page
+        //creating the the list in homepage makes the loading faster
+        appContacts = (List<User>) getIntent().getExtras().getSerializable("APP_CONTACTS");
 
         mAdapter = new CustomListAdapter(ContactsLists.this, R.layout.contact_list_item, appContacts);
         mListView.setAdapter(mAdapter);
 
+        //Opens the chat activity for one-to-one chat
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
                 Intent intent = new Intent(ContactsLists.this, MessageActivity.class);
                 User contactSelected = appContacts.get(position);
                 ChatListItem chat = new ChatListItem(contactSelected.getName(), contactSelected.getPhoneNumber());
@@ -68,8 +70,22 @@ public class ContactsLists extends AppCompatActivity{
                 startActivity(intent);
             }
         });
-
         mAdapter.notifyDataSetChanged();
+    }
+
+    /**
+     * Called when the activity has detected the user's press of the back
+     * key. The {@link #getOnBackPressedDispatcher() OnBackPressedDispatcher} will be given a
+     * chance to handle the back button before the default behavior of
+     * {@link Activity#onBackPressed()} is invoked.
+     *
+     * @see #getOnBackPressedDispatcher()
+     */
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        startActivity(new Intent(ContactsLists.this, HomeActivity.class));
+        finish();
     }
 
     //on clicking back button finish activity and go back
@@ -79,62 +95,12 @@ public class ContactsLists extends AppCompatActivity{
         return true;
     }
 
-    private void readContacts() {
-
-        phoneContacts.clear();
-        appContacts.clear();
-
-        Cursor phones = getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null,null,null, null);
-        while (phones.moveToNext())
-        {
-            //String name=phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
-            String phoneNo = phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
-
-            //remove white spaces
-            phoneNo = phoneNo.replaceAll("\\s+","");
-
-            int length = phoneNo.length();
-
-            //make sure you are not adding a landline number
-            if(length >= 10){
-
-                //convert format to match the format in the database
-                phoneNo = "+92"+phoneNo.substring(length-10);
-
-                //make sure the contacts are not repeated
-                if (!phoneContacts.contains(phoneNo)) {
-                    phoneContacts.add(phoneNo);
-                }
-            }
-        }
-        phones.close();
-
-        db.collection("users").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                if (task.isSuccessful()) {
-                    for (QueryDocumentSnapshot document : Objects.requireNonNull(task.getResult())) {
-                        if(phoneContacts.contains(document.getId())){
-
-                            User user = new User();
-                            user.setName(Objects.requireNonNull(document.getData().get("name")).toString());
-                            user.setPhoneNumber(document.getId());
-                            user.setDeviceToken(Objects.requireNonNull(document.getData().get("tokenId")).toString());
-
-                            appContacts.add(user);
-                            mAdapter.notifyDataSetChanged();
-                        }
-                        Log.d(TAG, document.getId() + " => " + document.getData());
-                    }
-                } else {
-                    Log.d(TAG, "Error getting documents: ", task.getException());
-                }
-            }
-        });
-        }
-
+    /*
+    * Requires: view used to start creation of the new chatroom
+    * Function: Starts new intent that allows the user to select
+    *           contacts to be added in the new chat
+    * */
     public void newChat(View view){
-
         Intent groupIntent = new Intent(ContactsLists.this, SelectGroupContacts.class);
         Bundle bundle = new Bundle();
         bundle.putSerializable("CONTACTS", (Serializable) appContacts);

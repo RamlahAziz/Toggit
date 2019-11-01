@@ -10,14 +10,21 @@ import android.util.Log;
 import com.firebase.client.Firebase;
 import com.firebase.ui.auth.AuthUI;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.SetOptions;
+import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.iid.InstanceIdResult;
 import com.strigiformes.teletalk.ConversationThreads.HomeActivity;
 
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 
 //this implements the firebase listenerRegistration process
@@ -77,6 +84,25 @@ public class MainActivity extends AppCompatActivity {
                                                 Log.d(TAG, "DocumentSnapshot data: " + document.getData());
 
                                                 Intent homeIntent = new Intent(MainActivity.this,  HomeActivity.class);
+
+                                                //update user token to ensure the user always gets notification
+                                                FirebaseInstanceId.getInstance().getInstanceId()
+                                                        .addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
+                                                            @Override
+                                                            public void onComplete(@NonNull Task<InstanceIdResult> task) {
+                                                                if (!task.isSuccessful()) {
+                                                                    Log.w(TAG, "getInstanceId failed", task.getException());
+                                                                    return;
+                                                                }
+
+                                                                // Update one field, creating the document if it does not already exist.
+                                                                Map<String, Object> data = new HashMap<>();
+                                                                data.put("tokenId", task.getResult().getToken());
+
+                                                                db.collection("users").document(user.getPhoneNumber())
+                                                                        .set(data, SetOptions.merge());
+                                                            }
+                                                        });
                                                 startActivity(homeIntent);
 
                                             } else {

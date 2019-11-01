@@ -1,12 +1,11 @@
 package com.strigiformes.teletalk.ConversationThreads;
 
 import android.content.Context;
-import android.util.Log;
+import android.graphics.Typeface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.strigiformes.teletalk.CustomObjects.ChatListItem;
@@ -16,10 +15,7 @@ import java.util.List;
 
 public class ChatListAdapter extends ArrayAdapter<ChatListItem> {
 
-    private TextView mFrom;
-    private TextView mTo;
     private TextView mName;
-    private ImageView mId;
     private TextView mPreview;
 
     public ChatListAdapter(Context context, int resource, List<ChatListItem> objects) {
@@ -29,24 +25,21 @@ public class ChatListAdapter extends ArrayAdapter<ChatListItem> {
     @Override
     public View getView(int position, View convertView, ViewGroup parent){
 
-        Log.d("testing0 ChatAdapter", "inside getview");
-
         LayoutInflater myCustomInflater = LayoutInflater.from(getContext());
         View customView = myCustomInflater.inflate(R.layout.chat_home_card, parent, false);
 
         mName =  customView.findViewById(R.id.name_chat);
-        //mId =  customView.findViewById(R.id.pictureChat);
         mPreview =  customView.findViewById(R.id.lastMessage);
 
         mName.setText(getItem(position).getName());
         mPreview.setText(getItem(position).getMsgPreview());
 
-        /*if (getItem(position).getPictureUri()!= null) {
-
-            Log.d("testing ChatAdapter", "inside if");
-            //Glide.with(getContext()).load(Uri.parse(getItem(position).getPictureUri())).apply(RequestOptions.circleCropTransform().placeholder(R.drawable.ic_avatar)).into(mId);
-
-        }*/
+        Long lastSeen = Long.parseLong(getItem(position).getLastSeen());
+        Long timeStamp = Long.parseLong(getItem(position).getTimeStamp());
+        int compared = lastSeen.compareTo(timeStamp);
+        if(compared < 0){
+            mPreview.setTypeface(mPreview.getTypeface(), Typeface.BOLD);
+        }
 
         return customView;
     }
