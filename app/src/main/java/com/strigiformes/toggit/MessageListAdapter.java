@@ -24,6 +24,11 @@ import java.util.List;
 
 public class MessageListAdapter extends RecyclerView.Adapter {
 
+    int sCorner = 15;
+    int sMargin = 20;
+    int sBorder = 10;
+    String sColor = "#F7CF70";
+
     private static final int VIEW_TYPE_MESSAGE_SENT = 1;
     private static final int VIEW_TYPE_MESSAGE_RECEIVED = 2;
     private static final int VIEW_TYPE_IMAGE_SENT = 3;
@@ -132,51 +137,61 @@ public class MessageListAdapter extends RecyclerView.Adapter {
 
     private class SentMessageHolder extends RecyclerView.ViewHolder {
         TextView messageText, timeText;
+        ImageView Image;
 
         SentMessageHolder(View itemView) {
             super(itemView);
 
             messageText =  itemView.findViewById(R.id.text_message_body);
             timeText =  itemView.findViewById(R.id.text_message_time);
+            Image = itemView.findViewById(R.id.item_image_received);
         }
 
         void bind(Message message) {
             messageText.setText(message.getTextMessage());
-
             // Format the stored timestamp into a readable String using method.
             timeText.setText(new SimpleDateFormat("hh:mm aaa").format(new Date(message.getTimestamp())));
-
+            if (message.getFileLoction() != null) {
+                Glide.with(mContext).
+                        load(Uri.parse(message.getFileLoction()))
+                        .error(R.drawable.attachment)
+                        .apply(RequestOptions.bitmapTransform(
+                                new com.strigiformes.teletalk.RoundedCornersTransformation(mContext,  sCorner, sColor, sBorder)))
+                        .into(Image);
+            }
         }
     }
 
     private class ReceivedMessageHolder extends RecyclerView.ViewHolder {
-        TextView messageText, timeText, nameText;
-        ImageView profileImage;
+        TextView messageText, timeText;
+        ImageView Image;
 
         ReceivedMessageHolder(View itemView) {
             super(itemView);
 
             messageText =  itemView.findViewById(R.id.text_message_body);
             timeText =  itemView.findViewById(R.id.text_message_time);
+            Image = itemView.findViewById(R.id.item_image_received);
         }
 
         void bind(Message message) {
 
             messageText.setText(message.getTextMessage());
             timeText.setText(new SimpleDateFormat("hh:mm aaa").format(new Date(message.getTimestamp())));
+            if (message.getFileLoction() != null) {
+                Glide.with(mContext).
+                        load(Uri.parse(message.getFileLoction()))
+                        .error(R.drawable.attachment)
+                        .apply(RequestOptions.bitmapTransform(
+                                new com.strigiformes.teletalk.RoundedCornersTransformation(mContext,  sCorner, sColor, sBorder)))
+                        .into(Image);
+            }
         }
     }
 
     private class ReceivedImageHolder extends RecyclerView.ViewHolder {
         TextView messageText, timeText, nameText;
         ImageView Image;
-
-        int sCorner = 15;
-        int sMargin = 20;
-
-        int sBorder = 10;
-        String sColor = "#F7CF70";
-
 
         ReceivedImageHolder(View itemView) {
             super(itemView);
@@ -195,7 +210,7 @@ public class MessageListAdapter extends RecyclerView.Adapter {
                     load(Uri.parse(message.getFileLoction()))
                     .error(R.drawable.attachment)
                     .apply(RequestOptions.bitmapTransform(
-                            new RoundedCornersTransformation(mContext,  sCorner, sColor, sBorder)))
+                            new com.strigiformes.teletalk.RoundedCornersTransformation(mContext,  sCorner, sColor, sBorder)))
                     .into(Image);
         }
     }
@@ -227,7 +242,7 @@ public class MessageListAdapter extends RecyclerView.Adapter {
                     load(Uri.parse(message.getFileLoction()))
                     .error(R.drawable.attachment)
                     .apply(RequestOptions.bitmapTransform(
-                            new RoundedCornersTransformation(mContext,  sCorner, sColor, sBorder)))
+                            new com.strigiformes.teletalk.RoundedCornersTransformation(mContext,  sCorner, sColor, sBorder)))
                     .into(Image);
         }
     }
