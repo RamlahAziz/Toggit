@@ -23,8 +23,7 @@
         </service>
 
         <activity
-            android:name=".GroupCreation.AddGroupName"
-            android:noHistory="true" />
+            android:name=".GroupCreation.AddGroupName" />
         <activity android:name=".MessageActivity" />
         <activity android:name=".StartUp.UserRegistration" />
         <activity

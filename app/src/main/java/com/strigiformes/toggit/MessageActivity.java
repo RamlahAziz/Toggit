@@ -16,7 +16,6 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.provider.OpenableColumns;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -114,7 +113,6 @@ public class MessageActivity extends AppCompatActivity  {
                 .set(data, SetOptions.merge());
 
         startActivity(new Intent(MessageActivity.this, HomeActivity.class));
-        finish();
     }
 
     @Override
@@ -122,7 +120,7 @@ public class MessageActivity extends AppCompatActivity  {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_message);
 
-        mNoMessageLayout = findViewById(R.id.noChatsLayout);
+        mNoMessageLayout = findViewById(R.id.noMessageLayout);
 
         Intent i = getIntent();
         chat = (ChatListItem) i.getSerializableExtra("CHAT");
@@ -180,7 +178,7 @@ public class MessageActivity extends AppCompatActivity  {
         }
 
         assert getSupportActionBar() != null;   //null check
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);   //show back button
+        //getSupportActionBar().setDisplayHomeAsUpEnabled(true);   //show back button
 
         if(groupChat){
             setTitle(groupName);
