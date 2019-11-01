@@ -25,7 +25,9 @@ Step 2: Connect your mobile to the laptop using USB (target device + ensure deve
         Alternatively: Use Emulator
 Step 3: click run
 
+Please ensure the app has access to your contacts. You must do this manually going to Applications -> Toggit -> Permissions -> Contacts (enabled)
+
 Links
-Firbase:
+Firebase:
 PlayStore:
 DemoLink:
