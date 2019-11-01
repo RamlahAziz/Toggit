@@ -1,4 +1,4 @@
-package com.strigiformes.teletalk;
+package com.strigiformes.toggit;
 
 import org.junit.Test;
 

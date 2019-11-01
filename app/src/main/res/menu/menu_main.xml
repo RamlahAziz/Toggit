@@ -2,22 +2,8 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context="com.strigiformes.teletalk.ConversationThreads.HomeActivity">
-    <item
-        android:id="@+id/action_blocked"
-        android:orderInCategory="100"
-        android:title="Blocked Chats"
-        app:showAsAction="never" />
-    <item
-        android:id="@+id/action_archived"
-        android:orderInCategory="100"
-        android:title="Archived Chats"
-        app:showAsAction="never" />
-    <item
-        android:id="@+id/action_settings"
-        android:orderInCategory="100"
-        android:title="Settings"
-        app:showAsAction="never" />
+    tools:context="com.strigiformes.toggit.ConversationThreads.HomeActivity">
+
     <item
         android:id="@+id/action_logout"
         android:orderInCategory="100"

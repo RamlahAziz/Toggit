@@ -1,4 +1,4 @@
-package com.strigiformes.teletalk.ConversationThreads;
+package com.strigiformes.toggit.ConversationThreads;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -21,6 +21,7 @@ import android.widget.ListView;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
@@ -33,6 +34,8 @@ import java.util.Objects;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentChange;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
@@ -40,23 +43,18 @@ import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
-import com.strigiformes.teletalk.CustomObjects.ChatListItem;
-import com.strigiformes.teletalk.Contacts.ContactsLists;
-import com.strigiformes.teletalk.CustomObjects.Message;
-import com.strigiformes.teletalk.CustomObjects.User;
-import com.strigiformes.teletalk.MessageActivity;
-import com.strigiformes.teletalk.R;
-import com.strigiformes.teletalk.StartUp.MainActivity;
+import com.strigiformes.toggit.CustomObjects.ChatListItem;
+import com.strigiformes.toggit.Contacts.ContactsLists;
+import com.strigiformes.toggit.CustomObjects.Message;
+import com.strigiformes.toggit.CustomObjects.User;
+import com.strigiformes.toggit.MessageActivity;
+import com.strigiformes.toggit.R;
+import com.strigiformes.toggit.StartUp.MainActivity;
 
-//Home screen of our app
-//This displays a list of current chats user has
-//with pictures, message received, time etc
-//new chat button in bottom right corner
 public class HomeActivity extends AppCompatActivity {
 
     private String TAG = "HomeActivity";
 
-    private String phone_Number;
     private ListView mListView;
     private View mNoChatsLayout;
     private List<ChatListItem> chatsList = new ArrayList<ChatListItem>();
@@ -74,8 +72,8 @@ public class HomeActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
-        //this is the xml file being used : activity_home
         setContentView(R.layout.activity_home);
 
         Toolbar toolbar = findViewById(R.id.toolbar);
@@ -86,6 +84,7 @@ public class HomeActivity extends AppCompatActivity {
         fab = findViewById(R.id.fab);
 
         showChats();
+        noChatsLayout();
 
          mAdapter = new ChatListAdapter(HomeActivity.this, R.layout.activity_home, chatsList);
          mListView.setAdapter(mAdapter);
@@ -119,25 +118,13 @@ public class HomeActivity extends AppCompatActivity {
                 //builder.setTitle("Choose an option");
 
                 // add a list
-                String[] actions = {"Archive", "Delete", "Block"};
+                String[] actions = {"Delete"};
                 builder.setItems(actions, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        switch (which) {
-                            case 0: // Archive
-                                //archive(chatsList.get(i).getChatId());
-                                break;
-                            case 1: // Delete
-                                ChatListItem chat = (ChatListItem) mListView.getItemAtPosition(i);
-                                deleteChat(chat, view);
-                                break;
-                            case 2: // Block
-                                //block(chatsList.get(i).getChatId(), chatsList.get(i).getToPhone());
-                                break;
-                            /*case 3: // Report
-                                break;*/
-                            default:
-                                break;
+                        ChatListItem chat = (ChatListItem) mListView.getItemAtPosition(i);
+                        if (which == 0) {
+                            deleteChat(chat);
                         }
                     }
                 });
@@ -165,11 +152,54 @@ public class HomeActivity extends AppCompatActivity {
         //readContacts();
     }
 
+    private void moveFirestoreDocument(final DocumentReference fromPath, final DocumentReference toPath) {
+        fromPath.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    if (document != null) {
+                        toPath.set(document.getData())
+                                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void aVoid) {
+                                        Log.d(TAG, "DocumentSnapshot successfully written!");
+                                        fromPath.delete();
+                                    }
+                                });
+                    } else {
+                        Log.d(TAG, "No such document");
+                    }
+                } else {
+                    Log.d(TAG, "get failed with ", task.getException());
+                }
+            }
+        });
+    }
+
+    public void archiveChat(ChatListItem chat){
+        String type;
+        if(chat.getGroup()){
+            type = "ChatRooms";
+        }else{
+            type = "userchats";
+        }
+
+        DocumentReference fromPath = db.collection("users").document(user.getPhoneNumber())
+                .collection(type).document(chat.getChatId());
+        DocumentReference toPath = db.collection("users").document(user.getPhoneNumber())
+                .collection("archived").document(chat.getChatId());
+        moveFirestoreDocument(fromPath, toPath);
+
+        chatsList.remove(chat);
+        mAdapter.notifyDataSetChanged();
+    }
+
     /*
     * Delete chate from user home
     * not from database
     * */
-    private void deleteChat(ChatListItem chat, View view){
+    private void deleteChat(ChatListItem chat){
         String type;
         if(chat.getGroup()){
             type = "ChatRooms";
@@ -204,21 +234,8 @@ public class HomeActivity extends AppCompatActivity {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        switch(id){
-
-            case R.id.action_blocked:
-                break;
-
-            case R.id.action_archived:
-                break;
-
-            case R.id.action_settings:
-                break;
-
-            case R.id.action_logout:
-                signOut();
-                break;
-
+        if (id == R.id.action_logout) {
+            signOut();
         }
 
         return super.onOptionsItemSelected(item);
@@ -263,6 +280,7 @@ public class HomeActivity extends AppCompatActivity {
 
                             chatsList.add(chatListItem);
                             mAdapter.notifyDataSetChanged();
+                            noChatsLayout();
                             break;
                         case MODIFIED:
                             Log.d(TAG, "Modified chat: " + dc.getDocument().getData());
@@ -315,6 +333,7 @@ public class HomeActivity extends AppCompatActivity {
                             Log.d("Adding chat in list", chatListItem.toString());
                             chatsList.add(chatListItem);
                             mAdapter.notifyDataSetChanged();
+                            noChatsLayout();
                             break;
                         case MODIFIED:
                             Log.d(TAG, "Modified chat: " + dc.getDocument().getData());
@@ -426,5 +445,13 @@ public class HomeActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
+    }
+
+    private void noChatsLayout(){
+        if(chatsList.size()>0){
+            mNoChatsLayout.setVisibility(View.INVISIBLE);
+        } else {
+            mNoChatsLayout.setVisibility(View.VISIBLE);
+        }
     }
 }

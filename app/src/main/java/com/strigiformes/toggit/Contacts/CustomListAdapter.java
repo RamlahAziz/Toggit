@@ -1,4 +1,4 @@
-package com.strigiformes.teletalk.Contacts;
+package com.strigiformes.toggit.Contacts;
 
 import android.content.Context;
 import android.util.Log;
@@ -9,8 +9,8 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
-import com.strigiformes.teletalk.CustomObjects.User;
-import com.strigiformes.teletalk.R;
+import com.strigiformes.toggit.CustomObjects.User;
+import com.strigiformes.toggit.R;
 
 import java.util.List;
 

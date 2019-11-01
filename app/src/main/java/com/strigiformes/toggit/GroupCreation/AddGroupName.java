@@ -1,4 +1,4 @@
-package com.strigiformes.teletalk.GroupCreation;
+package com.strigiformes.toggit.GroupCreation;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -16,10 +16,10 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.strigiformes.teletalk.Contacts.CustomListAdapter;
-import com.strigiformes.teletalk.CustomObjects.User;
-import com.strigiformes.teletalk.MessageActivity;
-import com.strigiformes.teletalk.R;
+import com.strigiformes.toggit.Contacts.CustomListAdapter;
+import com.strigiformes.toggit.CustomObjects.User;
+import com.strigiformes.toggit.MessageActivity;
+import com.strigiformes.toggit.R;
 
 import java.io.Serializable;
 import java.util.ArrayList;

@@ -1,4 +1,4 @@
-package com.strigiformes.teletalk.ConversationThreads;
+package com.strigiformes.toggit.ConversationThreads;
 
 import android.content.Context;
 import android.graphics.Typeface;
@@ -8,8 +8,8 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
-import com.strigiformes.teletalk.CustomObjects.ChatListItem;
-import com.strigiformes.teletalk.R;
+import com.strigiformes.toggit.CustomObjects.ChatListItem;
+import com.strigiformes.toggit.R;
 
 import java.util.List;
 
@@ -38,7 +38,7 @@ public class ChatListAdapter extends ArrayAdapter<ChatListItem> {
         Long timeStamp = Long.parseLong(getItem(position).getTimeStamp());
         int compared = lastSeen.compareTo(timeStamp);
         if(compared < 0){
-            mPreview.setTypeface(mPreview.getTypeface(), Typeface.BOLD);
+            mPreview.setTypeface(mPreview.getTypeface(), Typeface.BOLD_ITALIC);
         }
 
         return customView;

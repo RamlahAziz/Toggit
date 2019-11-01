@@ -1,4 +1,4 @@
-package com.strigiformes.teletalk;
+package com.strigiformes.toggit;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -43,10 +43,10 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
-import com.strigiformes.teletalk.ConversationThreads.HomeActivity;
-import com.strigiformes.teletalk.CustomObjects.ChatListItem;
-import com.strigiformes.teletalk.CustomObjects.Message;
-import com.strigiformes.teletalk.CustomObjects.User;
+import com.strigiformes.toggit.ConversationThreads.HomeActivity;
+import com.strigiformes.toggit.CustomObjects.ChatListItem;
+import com.strigiformes.toggit.CustomObjects.Message;
+import com.strigiformes.toggit.CustomObjects.User;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -548,7 +548,7 @@ public class MessageActivity extends AppCompatActivity  {
     private void retrieveChatMessages(){
         Log.d("chatId", chatId(user.getPhoneNumber(), receiver));
 
-        Query query = db.collection("chats").document(chat.getChatId())
+        Query query = db.collection("chats").document(chatId(user.getPhoneNumber(), receiver))
                 .collection("messages").orderBy("timestamp");
         listenerRegistration = query.addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
@@ -573,6 +573,7 @@ public class MessageActivity extends AppCompatActivity  {
     private void addToUserDocument(Message message){
 
         String chatID = chatId(user.getPhoneNumber(), receiver);
+        chat.setChatId(chatID);
         db.collection("users").document(user.getPhoneNumber())
                 .collection("userchats").document(chatID).set(message);
         db.collection("users").document(receiver)

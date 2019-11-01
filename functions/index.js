@@ -25,7 +25,7 @@ exports.WelcomeNotificaton = functions.firestore
     const payload = {
       data: {
         title: 'Hello!',
-        body: 'Welcome to TeleTalk, ' + username,
+        body: 'Welcome to Toggit, ' + username,
         click_action: 'WELCOME'
       }
     };
@@ -75,6 +75,8 @@ exports.GroupMessageAlert = functions.firestore
   .document('users/{phone}/ChatRooms/{chatroom}')
   .onUpdate(async (snap, context) => {
 
+    const seenBefore = BigInteger(snap.before.data().lastSeen);
+    const seenAfter = BigInteger(snap.after.data().lastSeen);
 
     const message = snap.after.data().lastMessage;
     console.log("LastMessage: ", message);
@@ -96,7 +98,7 @@ exports.GroupMessageAlert = functions.firestore
       }
     };
 
-    if (sender !== phoneNumber) {
+    if (sender !== phoneNumber && !(seenAfter>seenBefore)) {
       const snapshot = await admin.firestore().collection("users").doc(phoneNumber).get();
       const receiver = snapshot.data().tokenId;
       console.log('receiver', receiver);

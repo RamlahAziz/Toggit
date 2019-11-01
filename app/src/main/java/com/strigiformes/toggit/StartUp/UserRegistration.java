@@ -1,4 +1,4 @@
-package com.strigiformes.teletalk.StartUp;
+package com.strigiformes.toggit.StartUp;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -20,7 +20,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.InstanceIdResult;
-import com.strigiformes.teletalk.R;
+import com.strigiformes.toggit.R;
 
 import java.util.HashMap;
 import java.util.Map;
