@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
@@ -58,7 +59,7 @@ public class MessageActivity extends AppCompatActivity  {
 
     //private static final int ACTIVITY_NUM = 1;
     private String TAG = "MessageListActivity";
-    private static final int GET_FROM_PHONE = 1;
+    private static final int GET_FILE_FROM_PHONE = 1;
 
     private FirebaseAuth mauth = FirebaseAuth.getInstance();
     private FirebaseUser user = mauth.getCurrentUser();
@@ -70,6 +71,7 @@ public class MessageActivity extends AppCompatActivity  {
     private Button mSendButton;
     private ImageButton mAttachButton;
     private EditText mTextbox;
+    private ProgressDialog loadingbar;
     private View mNoMessageLayout;
 
     private List<Message> messageList = new ArrayList<>();
@@ -195,6 +197,7 @@ public class MessageActivity extends AppCompatActivity  {
          * so number of unread messages can be tracked
          * */
 
+        loadingbar = new ProgressDialog(MessageActivity.this);
         mMessageRecycler = (RecyclerView) findViewById(R.id.reyclerview_message_list);
         mAttachButton = findViewById(R.id.attach_button);
         mSendButton =  findViewById(R.id.button_chatbox_send);
@@ -203,14 +206,34 @@ public class MessageActivity extends AppCompatActivity  {
         mAttachButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //calls gallery
-                Intent addFile = new Intent(Intent.ACTION_GET_CONTENT, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                addFile.addCategory(Intent.CATEGORY_OPENABLE);
-                //addFile.setType("image/jpeg,image/png,image/jpg");
-                //if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                //    addFile.putExtra(Intent.EXTRA_MIME_TYPES,mimeTypes);
-                //}
-                startActivityForResult(addFile, GET_FROM_PHONE);
+
+                CharSequence options[] = new CharSequence[]{
+                        "Images",
+                        "PDF file"
+                };
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(MessageActivity.this);
+                builder.setTitle("Select Attachment Type");
+                builder.setItems(options, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        if (i == 0){
+                            //user wants to upload images calls gallery
+                            Intent addFile = new Intent(Intent.ACTION_GET_CONTENT, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                            addFile.setType("image/*");
+                            startActivityForResult(addFile, GET_FILE_FROM_PHONE);
+                        }
+                        if (i == 1){ //user uploads a pdf
+
+                            Intent addFile = new Intent(Intent.ACTION_GET_CONTENT, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                            addFile.setType("application/pdf");
+                            startActivityForResult(addFile, GET_FILE_FROM_PHONE);
+                        }
+                    }
+                });
+
+                builder.show();
+
             }
         });
 
@@ -253,22 +276,17 @@ public class MessageActivity extends AppCompatActivity  {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-
+        loadingbar.setTitle("Sending attachment");
+        loadingbar.setCanceledOnTouchOutside(false);
+        loadingbar.show();
         //Detects request codes
-        if(requestCode==GET_FROM_PHONE && resultCode == Activity.RESULT_OK) {
-            Uri selectedFile = null;
+        if(requestCode== GET_FILE_FROM_PHONE && resultCode == Activity.RESULT_OK) {
 
-            //new RequestOptions();
-            //Glide.with(ProfileDisplay.this)
-            //        .load(selectedFile)
-            //        .apply(RequestOptions.circleCropTransform().placeholder(R.drawable.ic_avatar)).into(mIDImage);
-            //String imageid;
-
-            String fileId;
+            //String fileId;
             if(data != null)
             {
                 String size = null;
-                selectedFile =data.getData();
+                final Uri selectedFile =data.getData();
                 Log.i(TAG, "Uri: " + selectedFile.toString());
                 size = getFileSize(selectedFile);
 
@@ -279,26 +297,7 @@ public class MessageActivity extends AppCompatActivity  {
                 builder.setPositiveButton("SEND", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-
-                    }
-                });
-                builder.setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.cancel();
-                    }
-                });
-
-
-                if (!size.equalsIgnoreCase("unknown")){
-                    if(Integer.valueOf(size)<20971520){
-
-                        //WRITE CODE TO show file HERE
-                        Log.d(TAG, "I'm less than 20 mb");
-
-                        //show the dialog
-                        builder.show();
-
+                        String fileId;
                         //uploading stuff HERE MARIA :D WE ALL LOVE YOU
                         //https://firebase.google.com/docs/storage/android/upload-files
                         if(selectedFile != null)
@@ -324,10 +323,10 @@ public class MessageActivity extends AppCompatActivity  {
 
                                                     Message message = new Message();
                                                     /*
-                                                    * TODO RAMLAH this text message needs to be a clickable
-                                                    *  widget that opens the file in the required reader
-                                                    * instead of a textview
-                                                    * */
+                                                     * done RAMLAH this text message needs to be a clickable
+                                                     *  widget that opens the file in the required reader
+                                                     * instead of a textview
+                                                     * */
 
                                                     message.setTextMessage(mFileName);
                                                     message.setFile(true);
@@ -341,36 +340,65 @@ public class MessageActivity extends AppCompatActivity  {
                                             });
                                             Task<Uri> urlTask=taskSnapshot.getStorage().getDownloadUrl();
 
+                                            loadingbar.dismiss();
                                             while(!urlTask.isSuccessful()){
 
+                                                //loading
                                             }
 
                                         }
                                     })
 
                                     .addOnFailureListener(new OnFailureListener() {
+
                                         @Override
                                         public void onFailure(@NonNull Exception e) {
+                                            loadingbar.dismiss();
                                         }
                                     })
 
                                     .addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
                                         @Override
                                         public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
+                                            double p = (100.0*taskSnapshot.getBytesTransferred())/taskSnapshot.getTotalByteCount();
+                                             loadingbar.setMessage((int)p+"% Uploading...");
                                         }
                                     });
                         }
+                    }
+                });
+                builder.setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                        loadingbar.dismiss();
+
+                    }
+                });
+
+
+                if (!size.equalsIgnoreCase("unknown")){
+                    if(Integer.valueOf(size)<20971520){
+
+                        //WRITE CODE TO show file HERE
+                        //Log.d(TAG, "I'm less than 20 mb");
+
+                        //show the dialog
+                        builder.show();
+
                     }
                     else {
                         Toast.makeText(getApplicationContext(),
                                 "Choose a file less than 20MB", Toast.LENGTH_SHORT)
                                 .show();
+                        loadingbar.dismiss();
                     }
                 }
                 else {
                     Toast.makeText(getApplicationContext(),
                             "This file is not supported, sorry", Toast.LENGTH_SHORT)
                             .show();
+                    loadingbar.dismiss();
 
                 }
 
