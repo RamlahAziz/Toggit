@@ -245,22 +245,6 @@ public class MessageActivity extends AppCompatActivity  {
                 LinearLayoutManager(MessageActivity.this, RecyclerView.VERTICAL,false);
         mManager.setStackFromEnd(true);
         mMessageRecycler.setLayoutManager(mManager);
-        mMessageRecycler.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
-            @Override
-            public void onLayoutChange(View v,
-                                       int left, int top, int right, int bottom,
-                                       int oldLeft, int oldTop, int oldRight, int oldBottom) {
-                if (bottom < oldBottom) {
-                    mMessageRecycler.postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            mMessageRecycler.smoothScrollToPosition(
-                                    mMessageRecycler.getAdapter().getItemCount() - 1);
-                        }
-                    }, 100);
-                }
-            }
-        });
         noMessagesLayout();
 
         if(groupChat){
