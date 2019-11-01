@@ -78,6 +78,7 @@ public class MessageActivity extends AppCompatActivity  {
     private ChatListItem chat;
     private String mFileName;
     private String receiver;
+    private String ChatNameForPopups;
 
     //For Group chat rooms
     List<User> groupList;
@@ -184,9 +185,11 @@ public class MessageActivity extends AppCompatActivity  {
 
         if(groupChat){
             setTitle(groupName);
+            ChatNameForPopups = groupName;
 
         } else{
             setTitle(chat.getName());
+            ChatNameForPopups = chat.getName();
         }
 
         user = mauth.getCurrentUser();
@@ -203,39 +206,44 @@ public class MessageActivity extends AppCompatActivity  {
         mSendButton =  findViewById(R.id.button_chatbox_send);
         mTextbox =  findViewById(R.id.edittext_chatbox);
 
-        mAttachButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
+        if(groupChat){
+            mAttachButton.setVisibility(View.GONE);
+        }
+        else{
+            mAttachButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
 
-                CharSequence options[] = new CharSequence[]{
-                        "Images",
-                        "PDF file"
-                };
+                    CharSequence options[] = new CharSequence[]{
+                            "Images",
+                            "PDF file"
+                    };
 
-                AlertDialog.Builder builder = new AlertDialog.Builder(MessageActivity.this);
-                builder.setTitle("Select Attachment Type");
-                builder.setItems(options, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        if (i == 0){
-                            //user wants to upload images calls gallery
-                            Intent addFile = new Intent(Intent.ACTION_GET_CONTENT, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                            addFile.setType("image/*");
-                            startActivityForResult(addFile, GET_FILE_FROM_PHONE);
+                    AlertDialog.Builder builder = new AlertDialog.Builder(MessageActivity.this);
+                    builder.setTitle("Select Attachment Type");
+                    builder.setItems(options, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            if (i == 0){
+                                //user wants to upload images calls gallery
+                                Intent addFile = new Intent(Intent.ACTION_GET_CONTENT, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                                addFile.setType("image/*");
+                                startActivityForResult(addFile, GET_FILE_FROM_PHONE);
+                            }
+                            if (i == 1){ //user uploads a pdf
+
+                                Intent addFile = new Intent(Intent.ACTION_GET_CONTENT, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                                addFile.setType("application/pdf");
+                                startActivityForResult(addFile, GET_FILE_FROM_PHONE);
+                            }
                         }
-                        if (i == 1){ //user uploads a pdf
+                    });
 
-                            Intent addFile = new Intent(Intent.ACTION_GET_CONTENT, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                            addFile.setType("application/pdf");
-                            startActivityForResult(addFile, GET_FILE_FROM_PHONE);
-                        }
-                    }
-                });
+                    builder.show();
 
-                builder.show();
-
-            }
-        });
+                }
+            });
+        }
 
         mMessageAdapter = new MessageListAdapter(MessageActivity.this, messageList);
 
@@ -261,6 +269,7 @@ public class MessageActivity extends AppCompatActivity  {
         super.onActivityResult(requestCode, resultCode, data);
 
         loadingbar.setTitle("Sending attachment");
+        loadingbar.setMessage("Please wait while we send the file...");
         loadingbar.setCanceledOnTouchOutside(false);
         loadingbar.show();
         //Detects request codes
@@ -277,7 +286,7 @@ public class MessageActivity extends AppCompatActivity  {
 
                 //Get popup dialog ready to confirm if user want to send file
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                builder.setMessage("Send \""+ mFileName+"\" to \""+chat.getName()+"\"?");
+                builder.setMessage("Send \""+ mFileName+"\" to \""+ChatNameForPopups+"\"?");
                 builder.setPositiveButton("SEND", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -453,7 +462,7 @@ public class MessageActivity extends AppCompatActivity  {
                             DocumentSnapshot receiverDoc = task.getResult();
                             message.setTokenReceiver(receiverDoc.getData().get("tokenId").toString());
                             message.setIdSender(user.getPhoneNumber());
-                            message.setIdReceiver(chat.getToPhone());
+                            message.setIdReceiver(receiver);
                             message.setTimestamp(System.currentTimeMillis());
                             message.setReceiverName(chat.getName());
                         }

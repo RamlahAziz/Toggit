@@ -50,20 +50,8 @@ public class SelectGroupContacts extends AppCompatActivity {
         appContacts = (List<User>) getIntent().getExtras().getSerializable("CONTACTS");
         Log.d("groupContacts", appContacts.toString());
 
-        final User me = new User();
-        me.setPhoneNumber(user.getPhoneNumber());
-        db.collection("users").document(me.getPhoneNumber()).get()
-                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                if (task.isSuccessful()) {
-                    DocumentSnapshot senderDoc = task.getResult();
-                    me.setName(senderDoc.getData().get("name").toString());
-                    me.setDeviceToken(senderDoc.getData().get("tokenId").toString());
-                    group.add(me);
-                }
-            }
-        });
+        group.clear();
+        addCreator();
 
         list = (ListView) findViewById(R.id.listview);
         listviewadapter = new CustomListAdapter(this, R.layout.contact_list_item,
@@ -92,7 +80,7 @@ public class SelectGroupContacts extends AppCompatActivity {
                         SparseBooleanArray selected = listviewadapter
                                 .getSelectedIds();
                         // Captures all selected ids with a loop
-                        group.clear();
+                        addCreator();
                         for (int i = (selected.size() - 1); i >= 0; i--) {
                             if (selected.valueAt(i)) {
                                 User selecteditem = listviewadapter
@@ -139,6 +127,23 @@ public class SelectGroupContacts extends AppCompatActivity {
     public boolean onSupportNavigateUp(){
         finish();
         return true;
+    }
+
+    public void addCreator(){
+        final User me = new User();
+        me.setPhoneNumber(user.getPhoneNumber());
+        db.collection("users").document(me.getPhoneNumber()).get()
+                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        if (task.isSuccessful()) {
+                            DocumentSnapshot senderDoc = task.getResult();
+                            me.setName(senderDoc.getData().get("name").toString());
+                            me.setDeviceToken(senderDoc.getData().get("tokenId").toString());
+                            group.add(me);
+                        }
+                    }
+                });
     }
 }
 
