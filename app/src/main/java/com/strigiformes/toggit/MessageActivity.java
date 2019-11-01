@@ -122,6 +122,8 @@ public class MessageActivity extends AppCompatActivity  {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_message);
 
+        mNoMessageLayout = findViewById(R.id.noChatsLayout);
+
         Intent i = getIntent();
         chat = (ChatListItem) i.getSerializableExtra("CHAT");
         home = Objects.requireNonNull(getIntent().getExtras()).getBoolean("HOME");
@@ -199,8 +201,6 @@ public class MessageActivity extends AppCompatActivity  {
         mAttachButton = findViewById(R.id.attach_button);
         mSendButton =  findViewById(R.id.button_chatbox_send);
         mTextbox =  findViewById(R.id.edittext_chatbox);
-        mNoMessageLayout = findViewById(R.id.noMessageLayout);
-
 
         mAttachButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -224,6 +224,7 @@ public class MessageActivity extends AppCompatActivity  {
                 LinearLayoutManager(MessageActivity.this, RecyclerView.VERTICAL,false);
         mManager.setStackFromEnd(true);
         mMessageRecycler.setLayoutManager(mManager);
+        noMessagesLayout();
 
         if(groupChat){
             sendGroupMessage(mSendButton);
@@ -531,6 +532,7 @@ public class MessageActivity extends AppCompatActivity  {
                     }
                     messageList.add(message);
                     mMessageAdapter.notifyDataSetChanged();
+                    noMessagesLayout();
                     break;
                 case MODIFIED:
                     Log.d(TAG, "Modified city: " + dc.getDocument().getData());
@@ -686,5 +688,13 @@ public class MessageActivity extends AppCompatActivity  {
     @Override
     protected void onResume() {
         super.onResume();
+    }
+
+    private void noMessagesLayout(){
+        if(messageList.size()>0){
+            mNoMessageLayout.setVisibility(View.INVISIBLE);
+        } else {
+            mNoMessageLayout.setVisibility(View.VISIBLE);
+        }
     }
 }
