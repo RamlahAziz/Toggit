@@ -1,4 +1,4 @@
-package com.strigiformes.teletalk.CustomObjects;
+package com.strigiformes.toggit.CustomObjects;
 
 import java.io.Serializable;
 import java.util.Objects;

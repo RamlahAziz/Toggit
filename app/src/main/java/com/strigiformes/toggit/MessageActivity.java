@@ -1,4 +1,4 @@
-package com.strigiformes.teletalk;
+package com.strigiformes.toggit;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -43,10 +43,10 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
-import com.strigiformes.teletalk.ConversationThreads.HomeActivity;
-import com.strigiformes.teletalk.CustomObjects.ChatListItem;
-import com.strigiformes.teletalk.CustomObjects.Message;
-import com.strigiformes.teletalk.CustomObjects.User;
+import com.strigiformes.toggit.ConversationThreads.HomeActivity;
+import com.strigiformes.toggit.CustomObjects.ChatListItem;
+import com.strigiformes.toggit.CustomObjects.Message;
+import com.strigiformes.toggit.CustomObjects.User;
 
 import java.util.ArrayList;
 import java.util.HashMap;

@@ -1,35 +1,25 @@
-package com.strigiformes.teletalk.Contacts;
+package com.strigiformes.toggit.Contacts;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.database.Cursor;
-import android.provider.ContactsContract;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
 import android.os.Bundle;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
-import com.strigiformes.teletalk.ConversationThreads.HomeActivity;
-import com.strigiformes.teletalk.CustomObjects.ChatListItem;
-import com.strigiformes.teletalk.CustomObjects.User;
-import com.strigiformes.teletalk.GroupCreation.SelectGroupContacts;
-import com.strigiformes.teletalk.MessageActivity;
-import com.strigiformes.teletalk.R;
+import com.strigiformes.toggit.ConversationThreads.HomeActivity;
+import com.strigiformes.toggit.CustomObjects.ChatListItem;
+import com.strigiformes.toggit.CustomObjects.User;
+import com.strigiformes.toggit.GroupCreation.SelectGroupContacts;
+import com.strigiformes.toggit.MessageActivity;
+import com.strigiformes.toggit.R;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 public class ContactsLists extends AppCompatActivity{
 

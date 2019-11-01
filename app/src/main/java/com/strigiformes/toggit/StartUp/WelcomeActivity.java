@@ -1,4 +1,4 @@
-package com.strigiformes.teletalk.StartUp;
+package com.strigiformes.toggit.StartUp;
 
 import android.content.Context;
 import android.content.Intent;
@@ -21,8 +21,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.viewpager.widget.PagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
-import com.strigiformes.teletalk.ConversationThreads.HomeActivity;
-import com.strigiformes.teletalk.R;
+import com.strigiformes.toggit.ConversationThreads.HomeActivity;
+import com.strigiformes.toggit.R;
 
 
 //this implements the welcome activity

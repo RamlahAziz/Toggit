@@ -1,4 +1,4 @@
-package com.strigiformes.teletalk.Service;
+package com.strigiformes.toggit.Service;
 
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -13,9 +13,9 @@ import android.util.Log;
 
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
-import com.strigiformes.teletalk.ConversationThreads.HomeActivity;
-import com.strigiformes.teletalk.R;
-import com.strigiformes.teletalk.StartUp.WelcomeActivity;
+import com.strigiformes.toggit.ConversationThreads.HomeActivity;
+import com.strigiformes.toggit.R;
+import com.strigiformes.toggit.StartUp.WelcomeActivity;
 
 import androidx.core.app.NotificationCompat;
 

@@ -1,4 +1,4 @@
-package com.strigiformes.teletalk;
+package com.strigiformes.toggit;
 
 import android.content.Context;
 import android.net.Uri;
@@ -15,7 +15,7 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.strigiformes.teletalk.CustomObjects.Message;
+import com.strigiformes.toggit.CustomObjects.Message;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;

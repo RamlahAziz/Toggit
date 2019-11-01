@@ -1,4 +1,4 @@
-package com.strigiformes.teletalk.ConversationThreads;
+package com.strigiformes.toggit.ConversationThreads;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -40,13 +40,13 @@ import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
-import com.strigiformes.teletalk.CustomObjects.ChatListItem;
-import com.strigiformes.teletalk.Contacts.ContactsLists;
-import com.strigiformes.teletalk.CustomObjects.Message;
-import com.strigiformes.teletalk.CustomObjects.User;
-import com.strigiformes.teletalk.MessageActivity;
-import com.strigiformes.teletalk.R;
-import com.strigiformes.teletalk.StartUp.MainActivity;
+import com.strigiformes.toggit.CustomObjects.ChatListItem;
+import com.strigiformes.toggit.Contacts.ContactsLists;
+import com.strigiformes.toggit.CustomObjects.Message;
+import com.strigiformes.toggit.CustomObjects.User;
+import com.strigiformes.toggit.MessageActivity;
+import com.strigiformes.toggit.R;
+import com.strigiformes.toggit.StartUp.MainActivity;
 
 //Home screen of our app
 //This displays a list of current chats user has
