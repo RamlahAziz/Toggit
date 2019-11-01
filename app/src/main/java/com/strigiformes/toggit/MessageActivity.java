@@ -543,7 +543,7 @@ public class MessageActivity extends AppCompatActivity  {
     private void retrieveChatMessages(){
         Log.d("chatId", chatId(user.getPhoneNumber(), receiver));
 
-        Query query = db.collection("chats").document(chat.getChatId())
+        Query query = db.collection("chats").document(chatId(user.getPhoneNumber(), receiver))
                 .collection("messages").orderBy("timestamp");
         listenerRegistration = query.addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
@@ -568,6 +568,7 @@ public class MessageActivity extends AppCompatActivity  {
     private void addToUserDocument(Message message){
 
         String chatID = chatId(user.getPhoneNumber(), receiver);
+        chat.setChatId(chatID);
         db.collection("users").document(user.getPhoneNumber())
                 .collection("userchats").document(chatID).set(message);
         db.collection("users").document(receiver)

@@ -25,7 +25,7 @@ exports.WelcomeNotificaton = functions.firestore
     const payload = {
       data: {
         title: 'Hello!',
-        body: 'Welcome to TeleTalk, ' + username,
+        body: 'Welcome to Toggit, ' + username,
         click_action: 'WELCOME'
       }
     };
