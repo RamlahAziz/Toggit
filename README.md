@@ -1,6 +1,8 @@
 # Toggit
 Chat application developed for Appcon 2019 by easypaisa
 
+DemoLink: https://drive.google.com/file/d/11MT02O74gxTiGK7JMNLUx5H_lVqNuBDK/view?usp=sharing
+
 Required IDEs
 1. Android Studio
 2. Visual Studio Code(Only if you want to make changes to index.js which contains the code for cloud functions)
@@ -26,8 +28,3 @@ Step 2: Connect your mobile to the laptop using USB (target device + ensure deve
 Step 3: click run
 
 Please ensure the app has access to your contacts. You must do this manually going to Settings ->Applications -> Toggit -> Permissions -> Contacts (enabled)
-
-Links
-Firebase:
-PlayStore:
-DemoLink: https://drive.google.com/file/d/11MT02O74gxTiGK7JMNLUx5H_lVqNuBDK/view?usp=sharing
