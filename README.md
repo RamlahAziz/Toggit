@@ -3,6 +3,9 @@ Chat application developed for Appcon 2019 by easypaisa
 
 # UI
 Various screenshots of the application are shown below
+
+<img src="https://github.com/RamlahAziz/Toggit/blob/master/blob/app-landing-page-4.jpeg" width="150">
+
 ![alt text](https://github.com/RamlahAziz/Toggit/blob/master/blob/app-landing-page-4.jpeg)
 ![alt text](https://github.com/RamlahAziz/Toggit/blob/master/blob/get-customer-details.jpeg)
 ![alt text](https://github.com/RamlahAziz/Toggit/blob/master/blob/home-page.jpeg)
