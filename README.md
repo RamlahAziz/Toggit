@@ -5,7 +5,7 @@ Chat application developed for Appcon 2019 by easypaisa
 DemoLink: https://drive.google.com/file/d/11MT02O74gxTiGK7JMNLUx5H_lVqNuBDK/view?usp=sharing
 
 # Architecture
-
+![alt text](https://github.com/RamlahAziz/Toggit/blob/master/blob/architecture.png?raw=true)
 
 # How to Run
 Required IDEs
