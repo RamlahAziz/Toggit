@@ -1,5 +1,5 @@
 # Toggit
-Chat application for Appcon
+Chat application developed for Appcon 2019 by easypaisa
 
 Required IDEs
 1. Android Studio
@@ -30,4 +30,4 @@ Please ensure the app has access to your contacts. You must do this manually goi
 Links
 Firebase:
 PlayStore:
-DemoLink:
+DemoLink: https://drive.google.com/file/d/11MT02O74gxTiGK7JMNLUx5H_lVqNuBDK/view?usp=sharing
