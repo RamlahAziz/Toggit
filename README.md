@@ -2,7 +2,15 @@
 Chat application developed for Appcon 2019 by easypaisa
 
 # UI
-DemoLink: https://drive.google.com/file/d/11MT02O74gxTiGK7JMNLUx5H_lVqNuBDK/view?usp=sharing
+Various screenshots of the application are shown below
+![alt text](https://github.com/RamlahAziz/Toggit/blob/master/blob/app-landing-page-4.jpeg)
+![alt text](https://github.com/RamlahAziz/Toggit/blob/master/blob/get-customer-details.jpeg)
+![alt text](https://github.com/RamlahAziz/Toggit/blob/master/blob/home-page.jpeg)
+![alt text](https://github.com/RamlahAziz/Toggit/blob/master/blob/empty-chat.jpeg)
+
+
+# DemoLink
+https://drive.google.com/file/d/11MT02O74gxTiGK7JMNLUx5H_lVqNuBDK/view?usp=sharing
 
 # Architecture
 ![alt text](https://github.com/RamlahAziz/Toggit/blob/master/blob/architecture.png?raw=true)
