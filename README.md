@@ -1,8 +1,13 @@
 # Toggit
 Chat application developed for Appcon 2019 by easypaisa
 
+# UI
 DemoLink: https://drive.google.com/file/d/11MT02O74gxTiGK7JMNLUx5H_lVqNuBDK/view?usp=sharing
 
+# Architecture
+
+
+# How to Run
 Required IDEs
 1. Android Studio
 2. Visual Studio Code(Only if you want to make changes to index.js which contains the code for cloud functions)
